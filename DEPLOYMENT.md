@@ -8,16 +8,43 @@
    - Go to https://github.com
    - Sign up for free
 
-2. **Push your code to GitHub**:
+2. **Push your code to GitHub using PAT token**:
+   
+   **First, create a repository on GitHub.com:**
+   - Go to https://github.com/new
+   - Name it: `unicef-3d-print-shop`
+   - Don't initialize with README
+   - Click "Create repository"
+   
+   **Then push your code with PAT token:**
    ```bash
    # In your project folder
+   cd /Users/jay/Documents/code/cursorprojects/unicef-3d-print-shop
+   
+   # Initialize git (if not already done)
    git init
    git add .
    git commit -m "Initial commit"
    git branch -M main
-   git remote add origin YOUR_GITHUB_REPO_URL
+   
+   # Add remote using PAT token in URL
+   # Replace YOUR_USERNAME and YOUR_PAT_TOKEN below
+   git remote add origin https://YOUR_PAT_TOKEN@github.com/YOUR_USERNAME/unicef-3d-print-shop.git
+   
+   # Push to GitHub
    git push -u origin main
    ```
+   
+   **Alternative: Use PAT when prompted:**
+   ```bash
+   # If you prefer to enter token when prompted:
+   git remote add origin https://github.com/YOUR_USERNAME/unicef-3d-print-shop.git
+   git push -u origin main
+   # When asked for username: enter your GitHub username
+   # When asked for password: paste your PAT token (not your GitHub password)
+   ```
+   
+   **Note:** Your PAT token should have `repo` scope/permissions.
 
 3. **Deploy to Vercel**:
    - Go to https://vercel.com
@@ -45,7 +72,7 @@
 
 ### Steps:
 
-1. **Push to GitHub** (same as Vercel step 1-2)
+1. **Push to GitHub using PAT token** (same as Vercel step 2 above)
 
 2. **Deploy to Netlify**:
    - Go to https://netlify.com

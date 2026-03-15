@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const loc = useLocation();
+  const { itemCount } = useCart();
   const nav = (path: string) =>
     loc.pathname === path
       ? "text-[#1CABE2] font-semibold"
@@ -18,10 +20,21 @@ export default function Layout({ children }: { children: ReactNode }) {
             </span>
             <span className="font-bold text-slate-800 text-lg">Prints for UNICEF</span>
           </Link>
-          <nav className="flex gap-6 text-sm">
+          <nav className="flex items-center gap-6 text-sm">
             <Link to="/" className={nav("/")}>Home</Link>
             <Link to="/shop" className={nav("/shop")}>Shop</Link>
             <Link to="/about" className={nav("/about")}>About</Link>
+            <Link to="/cart" className="relative flex items-center gap-1.5 text-slate-600 hover:text-[#374EA2]">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span>Cart</span>
+              {itemCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-[#1CABE2] text-white text-xs font-semibold">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
           </nav>
         </div>
       </header>
