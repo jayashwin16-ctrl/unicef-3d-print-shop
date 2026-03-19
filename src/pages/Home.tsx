@@ -2,17 +2,24 @@ import { Link } from "react-router-dom";
 import { products } from "../data/products";
 import ProductImage from "../components/ProductImage";
 
+/** Put your image in `public/Photos/` and set the path here (starts with `/Photos/...`). */
+const HERO_BACKGROUND_IMAGE = "/Photos/home-bg.jpg";
+
 export default function Home() {
   const featured = products.slice(0, 3);
   return (
     <div>
-      <section className="bg-gradient-to-br from-unicef-blue/10 via-white to-unicef-accent/10 border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+      <section
+        className="relative border-b border-slate-200 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('${HERO_BACKGROUND_IMAGE}')` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/10 to-unicef-accent/40" />
+        <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24 text-center text-white">
+          <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-sm mb-4">
             3D-printed goods.{" "}
-            <span className="text-unicef-dark">Real impact</span> for children.
+            <span className="text-white/90">Real impact</span> for children.
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8 drop-shadow-sm">
             Every purchase helps fund UNICEF programs. Shop unique 3D-printed items—keychains,
             puzzles, and more—knowing a share supports children worldwide.
           </p>
