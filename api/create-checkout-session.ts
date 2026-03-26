@@ -1,5 +1,7 @@
 import Stripe from "stripe";
 
+declare const process: { env: Record<string, string | undefined> };
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const config = {
@@ -12,6 +14,23 @@ type Body = {
   quantity?: number;
   items?: { productId: string; quantity: number }[];
 };
+
+function getAllowedCountries(): Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] {
+  const raw = process.env.STRIPE_ALLOWED_COUNTRIES || "US";
+  return raw
+    .split(",")
+    .map((x) => x.trim().toUpperCase())
+    .filter(Boolean) as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[];
+}
+
+function getShippingOptions(): Stripe.Checkout.SessionCreateParams.ShippingOption[] | undefined {
+  const standardRate = process.env.STRIPE_SHIPPING_RATE_STANDARD;
+  const expressRate = process.env.STRIPE_SHIPPING_RATE_EXPRESS;
+  const options: Stripe.Checkout.SessionCreateParams.ShippingOption[] = [];
+  if (standardRate) options.push({ shipping_rate: standardRate });
+  if (expressRate) options.push({ shipping_rate: expressRate });
+  return options.length > 0 ? options : undefined;
+}
 
 export default async function handler(
   req: { method?: string; body?: Body },
@@ -64,9 +83,14 @@ export default async function handler(
   }
 
   try {
+    const shippingOptions = getShippingOptions();
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
+      // Collect delivery details in Stripe Checkout
+      shipping_address_collection: { allowed_countries: getAllowedCountries() },
+      phone_number_collection: { enabled: true },
+      shipping_options: shippingOptions,
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
     });
