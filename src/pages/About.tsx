@@ -84,7 +84,7 @@ export default function About() {
           </div>
           <div>
             <label htmlFor="pickupEmail" className="mb-1 block text-sm font-semibold text-emerald-900">
-              Email
+              Parent Email
             </label>
             <input
               id="pickupEmail"
