@@ -1,6 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function About() {
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitted(true);
+    e.currentTarget.reset();
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-slate-900 mb-6">About this shop</h1>
@@ -29,6 +38,64 @@ export default function About() {
           .
         </p>
       </div>
+      <section className="mt-10 rounded-2xl border border-orange-300 bg-orange-50 p-6 shadow-sm">
+        <h2 className="text-2xl font-bold text-orange-900">Feedback form</h2>
+        <p className="mt-2 text-sm text-orange-800">
+          Tell us what you like and what we should improve.
+        </p>
+        {submitted && (
+          <p className="mt-4 rounded-lg bg-orange-200 px-3 py-2 text-sm font-medium text-orange-900">
+            Thanks for your feedback!
+          </p>
+        )}
+        <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="name" className="mb-1 block text-sm font-semibold text-orange-900">
+              Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              className="w-full rounded-lg border border-orange-300 bg-white px-3 py-2 text-slate-800 outline-none ring-orange-400 focus:ring-2"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="mb-1 block text-sm font-semibold text-orange-900">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="w-full rounded-lg border border-orange-300 bg-white px-3 py-2 text-slate-800 outline-none ring-orange-400 focus:ring-2"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label htmlFor="message" className="mb-1 block text-sm font-semibold text-orange-900">
+              Feedback
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows={4}
+              required
+              className="w-full rounded-lg border border-orange-300 bg-white px-3 py-2 text-slate-800 outline-none ring-orange-400 focus:ring-2"
+              placeholder="Share your feedback..."
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded-full bg-orange-500 px-6 py-2.5 font-semibold text-white transition hover:bg-orange-600"
+          >
+            Send feedback
+          </button>
+        </form>
+      </section>
       <Link to="/shop" className="inline-block mt-10 text-unicef-blue font-semibold hover:underline">
         Browse the shop →
       </Link>
