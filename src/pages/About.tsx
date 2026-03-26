@@ -58,7 +58,7 @@ export default function About() {
         <form className="mt-5 space-y-4" onSubmit={handlePickupSubmit}>
           <div>
             <label htmlFor="pickupName" className="mb-1 block text-sm font-semibold text-emerald-900">
-              Name
+              Full name
             </label>
             <input
               id="pickupName"
