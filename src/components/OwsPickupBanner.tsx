@@ -6,15 +6,15 @@ export default function OwsPickupBanner() {
     <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 shadow-sm">
       <p className="font-semibold">Open Window School pickup</p>
       <p className="mt-1 text-emerald-800">
-        If you will pick up your order at school, please submit the{" "}
-        <strong>OWS pickup form</strong> (full name, grade, and parent email) on the About page.
-        You can do this before or after you pay.
+        If you will pick up at school, fill out the <strong>OWS pickup form</strong> on the{" "}
+        <strong>Cart</strong> page (next to your order). Shipping address is entered on the next
+        step (Stripe). You can submit the OWS form before or after you pay.
       </p>
       <Link
-        to="/about#ows-pickup"
+        to="/cart#ows-cart-pickup"
         className="mt-2 inline-block font-semibold text-emerald-800 underline hover:text-emerald-950"
       >
-        Open OWS pickup form →
+        Go to Cart — OWS pickup form →
       </Link>
     </div>
   );

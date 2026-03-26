@@ -84,7 +84,7 @@ export default async function handler(
 
   try {
     const shippingOptions = getShippingOptions();
-    const owsAboutUrl = `${origin}/about#ows-pickup`;
+    const owsCartUrl = `${origin}/cart#ows-cart-pickup`;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items,
@@ -94,7 +94,7 @@ export default async function handler(
       shipping_options: shippingOptions,
       custom_text: {
         submit: {
-          message: `Open Window School pickup: if you will pick up at school, submit the OWS pickup form on our site (full name, grade, parent email). ${owsAboutUrl}`,
+          message: `Open Window School pickup: fill out the OWS pickup form on our Cart page before or after paying: ${owsCartUrl}`,
         },
       },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

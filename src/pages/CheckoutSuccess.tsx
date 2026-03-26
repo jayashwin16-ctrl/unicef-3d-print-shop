@@ -22,11 +22,11 @@ export default function CheckoutSuccess() {
         </p>
         <p className="text-sm text-slate-600 mb-8 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-left">
           <strong className="text-emerald-900">Open Window School pickup:</strong> if you pick up at
-          school, remember to submit the{" "}
+          school and have not submitted the form yet, use the{" "}
           <Link to="/about#ows-pickup" className="font-semibold text-emerald-800 underline">
-            OWS pickup form
-          </Link>{" "}
-          (full name, grade, parent email) if you have not already.
+            OWS pickup form on the About page
+          </Link>
+          . (Before paying, it is also on the Cart page next to your order.)
         </p>
         <Link
           to="/shop"

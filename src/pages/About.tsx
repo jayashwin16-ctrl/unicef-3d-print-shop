@@ -1,19 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import OwsPickupForm from "../components/OwsPickupForm";
 
 export default function About() {
   const [submitted, setSubmitted] = useState(false);
-  const [pickupSubmitted, setPickupSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitted(true);
-    e.currentTarget.reset();
-  };
-
-  const handlePickupSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setPickupSubmitted(true);
     e.currentTarget.reset();
   };
 
@@ -45,64 +39,9 @@ export default function About() {
           .
         </p>
       </div>
-      <section id="ows-pickup" className="mt-10 scroll-mt-24 rounded-2xl border border-emerald-300 bg-emerald-50 p-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-emerald-900">OWS pickup form</h2>
-        <p className="mt-2 text-sm text-emerald-800">
-          For Open Window School pickup, share your name, grade, and email.
-        </p>
-        {pickupSubmitted && (
-          <p className="mt-4 rounded-lg bg-emerald-200 px-3 py-2 text-sm font-medium text-emerald-900">
-            Thanks! Your OWS pickup info was submitted.
-          </p>
-        )}
-        <form className="mt-5 space-y-4" onSubmit={handlePickupSubmit}>
-          <div>
-            <label htmlFor="pickupName" className="mb-1 block text-sm font-semibold text-emerald-900">
-              Full name
-            </label>
-            <input
-              id="pickupName"
-              name="pickupName"
-              type="text"
-              required
-              className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
-              placeholder="Student name"
-            />
-          </div>
-          <div>
-            <label htmlFor="pickupGrade" className="mb-1 block text-sm font-semibold text-emerald-900">
-              Grade
-            </label>
-            <input
-              id="pickupGrade"
-              name="pickupGrade"
-              type="text"
-              required
-              className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
-              placeholder="Example: 4th grade"
-            />
-          </div>
-          <div>
-            <label htmlFor="pickupEmail" className="mb-1 block text-sm font-semibold text-emerald-900">
-              Parent Email
-            </label>
-            <input
-              id="pickupEmail"
-              name="pickupEmail"
-              type="email"
-              required
-              className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
-              placeholder="parent@example.com"
-            />
-          </div>
-          <button
-            type="submit"
-            className="rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white transition hover:bg-emerald-700"
-          >
-            Submit pickup details
-          </button>
-        </form>
-      </section>
+      <div className="mt-10">
+        <OwsPickupForm sectionId="ows-pickup" />
+      </div>
       <section className="mt-10 rounded-2xl border border-orange-300 bg-orange-50 p-6 shadow-sm">
         <h2 className="text-2xl font-bold text-orange-900">Feedback form</h2>
         <p className="mt-2 text-sm text-orange-800">
