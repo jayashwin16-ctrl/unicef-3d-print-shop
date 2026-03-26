@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { getProduct } from "../data/products";
+import OwsPickupBanner from "../components/OwsPickupBanner";
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, itemCount } = useCart();
@@ -114,7 +115,9 @@ export default function Cart() {
         <div className="p-4 divide-y divide-slate-100">
           {rows}
         </div>
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col gap-4">
+          <OwsPickupBanner />
+          <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="text-lg font-bold text-slate-900">
             Total: {currency} {total}
           </p>
@@ -138,6 +141,7 @@ export default function Cart() {
             >
               {loading ? "Redirecting…" : "Proceed to checkout"}
             </button>
+          </div>
           </div>
         </div>
       </div>

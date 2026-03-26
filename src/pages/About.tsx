@@ -45,7 +45,7 @@ export default function About() {
           .
         </p>
       </div>
-      <section className="mt-10 rounded-2xl border border-emerald-300 bg-emerald-50 p-6 shadow-sm">
+      <section id="ows-pickup" className="mt-10 scroll-mt-24 rounded-2xl border border-emerald-300 bg-emerald-50 p-6 shadow-sm">
         <h2 className="text-2xl font-bold text-emerald-900">OWS pickup form</h2>
         <p className="mt-2 text-sm text-emerald-800">
           For Open Window School pickup, share your name, grade, and email.

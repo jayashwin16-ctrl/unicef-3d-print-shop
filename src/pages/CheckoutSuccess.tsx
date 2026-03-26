@@ -17,8 +17,16 @@ export default function CheckoutSuccess() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Thank you for your order</h1>
-        <p className="text-slate-600 mb-8">
+        <p className="text-slate-600 mb-4">
           Payment was successful. A portion of your purchase supports our donation efforts.
+        </p>
+        <p className="text-sm text-slate-600 mb-8 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-left">
+          <strong className="text-emerald-900">Open Window School pickup:</strong> if you pick up at
+          school, remember to submit the{" "}
+          <Link to="/about#ows-pickup" className="font-semibold text-emerald-800 underline">
+            OWS pickup form
+          </Link>{" "}
+          (full name, grade, parent email) if you have not already.
         </p>
         <Link
           to="/shop"
