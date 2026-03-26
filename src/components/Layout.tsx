@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       : "text-slate-600 hover:text-[#374EA2]";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-unicef-blue/15 via-white to-unicef-accent/20">
       <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2">
