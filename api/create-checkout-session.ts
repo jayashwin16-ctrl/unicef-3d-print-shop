@@ -13,6 +13,8 @@ type Body = {
   productId?: string;
   quantity?: number;
   items?: { productId: string; quantity: number }[];
+  /** pickup = in person (no Stripe shipping). delivery = ship to address. */
+  fulfillment?: "pickup" | "delivery";
 };
 
 function getAllowedCountries(): Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] {
@@ -41,7 +43,8 @@ export default async function handler(
     return;
   }
 
-  const { baseUrl, productId, quantity = 1, items: cartItems } = req.body || {};
+  const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment } = req.body || {};
+  const fulfillment: "pickup" | "delivery" = rawFulfillment === "pickup" ? "pickup" : "delivery";
   if (!baseUrl) {
     res.status(400).json({ error: "Missing baseUrl" });
     return;
@@ -84,22 +87,33 @@ export default async function handler(
 
   try {
     const shippingOptions = getShippingOptions();
-    const owsCartUrl = `${origin}/cart#ows-cart-pickup`;
-    const session = await stripe.checkout.sessions.create({
+    const pickupFormCartUrl = `${origin}/cart#school-pickup-cart`;
+
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       line_items,
-      // Collect delivery details in Stripe Checkout
-      shipping_address_collection: { allowed_countries: getAllowedCountries() },
       phone_number_collection: { enabled: true },
-      shipping_options: shippingOptions,
-      custom_text: {
-        submit: {
-          message: `Open Window School pickup: fill out the OWS pickup form on our Cart page before or after paying: ${owsCartUrl}`,
-        },
-      },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
-    });
+    };
+
+    if (fulfillment === "delivery") {
+      sessionParams.shipping_address_collection = { allowed_countries: getAllowedCountries() };
+      if (shippingOptions) sessionParams.shipping_options = shippingOptions;
+      sessionParams.custom_text = {
+        submit: {
+          message: `Shipping: enter your address on this page. School pickup instead? Use “Get in person” on our Cart, or fill the pickup form: ${pickupFormCartUrl}`,
+        },
+      };
+    } else {
+      sessionParams.custom_text = {
+        submit: {
+          message: `In-person pickup: fill out the school pickup form on our site before or after paying: ${pickupFormCartUrl}`,
+        },
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({ url: session.url });

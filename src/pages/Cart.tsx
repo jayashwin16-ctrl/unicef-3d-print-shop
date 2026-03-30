@@ -2,23 +2,23 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { getProduct } from "../data/products";
-import OwsPickupForm from "../components/OwsPickupForm";
+import SchoolPickupForm from "../components/SchoolPickupForm";
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, itemCount } = useCart();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<null | "pickup" | "delivery">(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (fulfillment: "pickup" | "delivery") => {
     if (items.length === 0) return;
-    setLoading(true);
+    setLoading(fulfillment);
     setError(null);
     try {
       const baseUrl = window.location.origin;
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseUrl, items }),
+        body: JSON.stringify({ baseUrl, items, fulfillment }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Checkout failed");
@@ -27,7 +27,7 @@ export default function Cart() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -46,13 +46,13 @@ export default function Cart() {
         </div>
         <div className="max-w-xl mx-auto space-y-4">
           <p className="text-center text-sm text-slate-600">
-            Open Window School pickup? You can still fill out the form below, or see the{" "}
-            <Link to="/about#ows-pickup" className="font-semibold text-unicef-blue underline">
+            Picking up at school? You can still fill out the form below, or see the{" "}
+            <Link to="/about#school-pickup" className="font-semibold text-unicef-blue underline">
               About page
             </Link>
             .
           </p>
-          <OwsPickupForm sectionId="ows-cart-pickup" idSuffix="cart-empty" />
+          <SchoolPickupForm sectionId="school-pickup-cart" idSuffix="cart-empty" />
         </div>
       </div>
     );
@@ -139,21 +139,31 @@ export default function Cart() {
                     {error}
                   </p>
                 )}
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    to="/shop"
-                    className="px-5 py-2.5 rounded-full border border-slate-300 text-slate-700 font-medium hover:bg-slate-100 transition"
-                  >
-                    Continue shopping
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={handleCheckout}
-                    disabled={loading}
-                    className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {loading ? "Redirecting…" : "Proceed to checkout"}
-                  </button>
+                <div className="flex flex-col gap-3 w-full sm:w-auto sm:items-end">
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      to="/shop"
+                      className="px-5 py-2.5 rounded-full border border-slate-300 text-slate-700 font-medium hover:bg-slate-100 transition"
+                    >
+                      Continue shopping
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleCheckout("pickup")}
+                      disabled={loading !== null}
+                      className="px-6 py-2.5 rounded-full border-2 border-emerald-600 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {loading === "pickup" ? "Redirecting…" : "Get in person"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCheckout("delivery")}
+                      disabled={loading !== null}
+                      className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {loading === "delivery" ? "Redirecting…" : "Delivered to you"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,13 +172,19 @@ export default function Cart() {
 
         <div className="lg:col-span-2 lg:sticky lg:top-24 space-y-3">
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="font-semibold text-slate-900">Shipping & delivery</p>
-            <p className="mt-1 text-sm text-slate-600">
-              Your <strong>shipping address</strong> and phone are collected on the next screen
-              (Stripe) when you click <strong>Proceed to checkout</strong>.
-            </p>
+            <p className="font-semibold text-slate-900">How do you want your order?</p>
+            <ul className="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
+              <li>
+                <strong>Get in person</strong> — pay on the next screen; no shipping address there.
+                Use the <strong>school pickup form</strong> here.
+              </li>
+              <li>
+                <strong>Delivered to you</strong> — pay on the next screen; enter your{" "}
+                <strong>shipping address</strong> and phone there (Stripe).
+              </li>
+            </ul>
           </div>
-          <OwsPickupForm sectionId="ows-cart-pickup" idSuffix="cart" />
+          <SchoolPickupForm sectionId="school-pickup-cart" idSuffix="cart" />
         </div>
       </div>
     </div>

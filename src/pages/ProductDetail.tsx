@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getProduct } from "../data/products";
 import ProductImageSlider from "../components/ProductImageSlider";
-import OwsPickupBanner from "../components/OwsPickupBanner";
+import SchoolPickupBanner from "../components/SchoolPickupBanner";
 import { useCart } from "../context/CartContext";
 
 type Review = {
@@ -131,7 +131,7 @@ export default function ProductDetail() {
             {product.donationPercent}% of this item is pledged to support donation efforts aligned with UNICEF values.
           </p>
           <div className="mt-6">
-            <OwsPickupBanner />
+            <SchoolPickupBanner />
           </div>
           {error && (
             <p className="mt-4 text-sm text-red-600" role="alert">
