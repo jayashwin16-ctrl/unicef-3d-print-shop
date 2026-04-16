@@ -1,4 +1,4 @@
-/** Shown next to Buy now / cart checkout: remind shoppers to use @ows.org. */
+/** Shown next to Buy now / cart checkout. */
 export default function BobcatCheckoutNotice({ className = "" }: { className?: string }) {
   return (
     <div
@@ -7,8 +7,7 @@ export default function BobcatCheckoutNotice({ className = "" }: { className?: s
     >
       <p className="font-semibold text-[#1CABE2]">Bobcat email required to buy</p>
       <p className="mt-1">
-        Put your <strong>Bobcat</strong> school address — it must end with <strong>@ows.org</strong> (for
-        example <span className="whitespace-nowrap">first.last@ows.org</span>).
+        Put your <strong>Bobcat</strong> school email before continuing to checkout.
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ const BOBCAT_EMAIL_DOMAIN = "ows.org";
 type SchoolCheckoutGateModalProps = {
   open: boolean;
   onClose: () => void;
-  /** Called after a valid @ows.org email is confirmed; parent starts Stripe redirect. */
+  /** Called after a valid school email is confirmed; parent starts Stripe redirect. */
   onVerified: () => void;
 };
 
@@ -27,7 +27,7 @@ export default function SchoolCheckoutGateModal({ open, onClose, onVerified }: S
     setError("");
 
     if (!isBobcatEmail(email)) {
-      setError(`Use your Bobcat email — it must end with @${BOBCAT_EMAIL_DOMAIN}.`);
+      setError("Use your Bobcat school email.");
       return;
     }
 
@@ -55,13 +55,12 @@ export default function SchoolCheckoutGateModal({ open, onClose, onVerified }: S
           Bobcat checkout
         </h2>
         <p className="mt-2 text-sm text-slate-600">
-          Enter the <strong>Bobcat</strong> email you use at school. It must end with{" "}
-          <strong>@ows.org</strong> to continue to payment.
+          Enter the <strong>Bobcat</strong> email you use at school to continue to payment.
         </p>
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="checkout-gate-email">
-              Bobcat email (@ows.org)
+              Bobcat school email
             </label>
             <input
               id="checkout-gate-email"
@@ -70,7 +69,7 @@ export default function SchoolCheckoutGateModal({ open, onClose, onVerified }: S
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-[#1CABE2]"
-              placeholder={`first.last@${BOBCAT_EMAIL_DOMAIN}`}
+              placeholder="name@school email"
               autoComplete="email"
             />
           </div>
