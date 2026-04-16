@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getProduct } from "../data/products";
 import ProductImageSlider from "../components/ProductImageSlider";
 import SchoolPickupBanner from "../components/SchoolPickupBanner";
+import SchoolCheckoutGateModal from "../components/SchoolCheckoutGateModal";
+import BobcatCheckoutNotice from "../components/BobcatCheckoutNotice";
+import { hasSchoolCheckoutAccess } from "../lib/schoolCheckoutAccess";
 import { useCart } from "../context/CartContext";
 
 type Review = {
@@ -30,6 +33,8 @@ export default function ProductDetail() {
   const [reviewMessage, setReviewMessage] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [checkoutGateOpen, setCheckoutGateOpen] = useState(false);
+  const resumeAfterGate = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!product) return;
@@ -55,7 +60,7 @@ export default function ProductDetail() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const handleBuyNow = async () => {
+  const performBuyNow = async () => {
     if (!product) return;
     setLoading(true);
     setError(null);
@@ -75,6 +80,18 @@ export default function ProductDetail() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBuyNow = () => {
+    const go = () => {
+      void performBuyNow();
+    };
+    if (!hasSchoolCheckoutAccess()) {
+      resumeAfterGate.current = go;
+      setCheckoutGateOpen(true);
+      return;
+    }
+    go();
   };
 
   if (!product) {
@@ -109,6 +126,17 @@ export default function ProductDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <SchoolCheckoutGateModal
+        open={checkoutGateOpen}
+        onClose={() => {
+          setCheckoutGateOpen(false);
+          resumeAfterGate.current = null;
+        }}
+        onVerified={() => {
+          resumeAfterGate.current?.();
+          resumeAfterGate.current = null;
+        }}
+      />
       <Link to="/shop" className="text-sm text-unicef-blue hover:underline mb-8 inline-block">
         ← Back to shop
       </Link>
@@ -138,7 +166,8 @@ export default function ProductDetail() {
               {error}
             </p>
           )}
-          <div className="mt-8 flex flex-wrap gap-3">
+          <BobcatCheckoutNotice className="mt-6" />
+          <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
               onClick={handleAddToCart}
