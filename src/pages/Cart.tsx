@@ -1,18 +1,13 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { getProduct } from "../data/products";
 import SchoolPickupForm from "../components/SchoolPickupForm";
-import SchoolCheckoutGateModal from "../components/SchoolCheckoutGateModal";
-import BobcatCheckoutNotice from "../components/BobcatCheckoutNotice";
-import { hasSchoolCheckoutAccess } from "../lib/schoolCheckoutAccess";
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, itemCount } = useCart();
   const [loading, setLoading] = useState<null | "pickup" | "delivery">(null);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutGateOpen, setCheckoutGateOpen] = useState(false);
-  const pendingFulfillment = useRef<"pickup" | "delivery" | null>(null);
 
   const handleCheckout = async (fulfillment: "pickup" | "delivery") => {
     if (items.length === 0) return;
@@ -34,15 +29,6 @@ export default function Cart() {
     } finally {
       setLoading(null);
     }
-  };
-
-  const requestCheckout = (fulfillment: "pickup" | "delivery") => {
-    if (!hasSchoolCheckoutAccess()) {
-      pendingFulfillment.current = fulfillment;
-      setCheckoutGateOpen(true);
-      return;
-    }
-    void handleCheckout(fulfillment);
   };
 
   if (itemCount === 0) {
@@ -136,18 +122,6 @@ export default function Cart() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <SchoolCheckoutGateModal
-        open={checkoutGateOpen}
-        onClose={() => {
-          setCheckoutGateOpen(false);
-          pendingFulfillment.current = null;
-        }}
-        onVerified={() => {
-          const f = pendingFulfillment.current;
-          pendingFulfillment.current = null;
-          if (f) void handleCheckout(f);
-        }}
-      />
       <h1 className="text-2xl font-bold text-slate-900 mb-6">Cart</h1>
       <div className="grid gap-8 lg:grid-cols-5 lg:items-start">
         <div className="lg:col-span-3">
@@ -165,7 +139,6 @@ export default function Cart() {
                     {error}
                   </p>
                 )}
-                <BobcatCheckoutNotice className="w-full" />
                 <div className="flex flex-col gap-3 w-full sm:w-auto sm:items-end">
                   <div className="flex flex-wrap gap-3">
                     <Link
@@ -176,7 +149,7 @@ export default function Cart() {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => requestCheckout("pickup")}
+                      onClick={() => handleCheckout("pickup")}
                       disabled={loading !== null}
                       className="px-6 py-2.5 rounded-full border-2 border-emerald-600 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
                     >
@@ -184,7 +157,7 @@ export default function Cart() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => requestCheckout("delivery")}
+                      onClick={() => handleCheckout("delivery")}
                       disabled={loading !== null}
                       className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition disabled:opacity-60 disabled:cursor-not-allowed"
                     >
