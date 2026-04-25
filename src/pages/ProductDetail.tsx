@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../data/products";
 import ProductImageSlider from "../components/ProductImageSlider";
 import SchoolPickupBanner from "../components/SchoolPickupBanner";
@@ -20,9 +20,9 @@ function getReviewStorageKey(productId: string) {
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const product = id ? getProduct(id) : undefined;
   const { addItem } = useCart();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
   const [stars, setStars] = useState<number>(5);
@@ -55,26 +55,10 @@ export default function ProductDetail() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (!product) return;
-    setLoading(true);
     setError(null);
-    try {
-      const baseUrl = window.location.origin;
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, quantity: 1, baseUrl }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Checkout failed");
-      if (data.url) window.location.href = data.url;
-      else throw new Error("No checkout URL returned");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    navigate("/checkout", { state: { buyNow: { productId: product.id, quantity: 1 } } });
   };
 
   if (!product) {
@@ -149,10 +133,9 @@ export default function ProductDetail() {
             <button
               type="button"
               onClick={handleBuyNow}
-              disabled={loading}
-              className="w-full md:w-auto bg-unicef-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-unicef-dark transition disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full md:w-auto bg-unicef-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-unicef-dark transition"
             >
-              {loading ? "Redirecting…" : "Buy now"}
+              Buy now
             </button>
           </div>
 

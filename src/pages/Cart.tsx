@@ -1,35 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { getProduct } from "../data/products";
 import SchoolPickupForm from "../components/SchoolPickupForm";
 
 export default function Cart() {
+  const navigate = useNavigate();
   const { items, removeItem, updateQuantity, itemCount } = useCart();
-  const [loading, setLoading] = useState<null | "pickup" | "delivery">(null);
   const [error, setError] = useState<string | null>(null);
-
-  const handleCheckout = async (fulfillment: "pickup" | "delivery") => {
-    if (items.length === 0) return;
-    setLoading(fulfillment);
-    setError(null);
-    try {
-      const baseUrl = window.location.origin;
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseUrl, items, fulfillment }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Checkout failed");
-      if (data.url) window.location.href = data.url;
-      else throw new Error("No checkout URL returned");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setLoading(null);
-    }
-  };
 
   if (itemCount === 0) {
     return (
@@ -149,19 +127,25 @@ export default function Cart() {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => handleCheckout("pickup")}
-                      disabled={loading !== null}
-                      className="px-6 py-2.5 rounded-full border-2 border-emerald-600 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        setError(null);
+                        if (itemCount === 0) return;
+                        navigate("/checkout", { state: { fromCart: true, fulfillment: "pickup" } });
+                      }}
+                      className="px-6 py-2.5 rounded-full border-2 border-emerald-600 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
                     >
-                      {loading === "pickup" ? "Redirecting…" : "Get in person"}
+                      Get in person
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleCheckout("delivery")}
-                      disabled={loading !== null}
-                      className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        setError(null);
+                        if (itemCount === 0) return;
+                        navigate("/checkout", { state: { fromCart: true, fulfillment: "delivery" } });
+                      }}
+                      className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition"
                     >
-                      {loading === "delivery" ? "Redirecting…" : "Delivered to you"}
+                      Delivered to you
                     </button>
                   </div>
                 </div>

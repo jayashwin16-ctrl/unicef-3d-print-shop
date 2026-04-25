@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { CH_OK, clearCookie, parseCookieHeader, verifyOkCookie, type OkPayload } from "./lib/checkout-cookies";
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -15,7 +16,24 @@ type Body = {
   items?: { productId: string; quantity: number }[];
   /** pickup = in person (no Stripe shipping). delivery = ship to address. */
   fulfillment?: "pickup" | "delivery";
+  /** Must match verified email code step */
+  checkoutType?: "bobcat" | "regular";
+  /** Bobcat flow */
+  bobcat?: { name: string; grade: string; bobcatEmail: string };
+  /** Regular (friends) flow */
+  regular?: { name: string; homeAddress: string; email: string };
 };
+
+type HandlerReq = {
+  method?: string;
+  body?: Body;
+  headers?: { cookie?: string };
+};
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return s.slice(0, max - 1) + "…";
+}
 
 function getAllowedCountries(): Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] {
   const raw = process.env.STRIPE_ALLOWED_COUNTRIES || "US";
@@ -35,16 +53,50 @@ function getShippingOptions(): Stripe.Checkout.SessionCreateParams.ShippingOptio
 }
 
 export default async function handler(
-  req: { method?: string; body?: Body },
-  res: { status: (n: number) => { json: (o: object) => void }; setHeader: (a: string, b: string) => void }
+  req: HandlerReq,
+  res: { status: (n: number) => { json: (o: object) => void }; setHeader: (a: string, b: string | string[] | number) => void }
 ) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
 
-  const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment } = req.body || {};
+  const body = (req.body || {}) as Body;
+  const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment, checkoutType, bobcat, regular } =
+    body;
   const fulfillment: "pickup" | "delivery" = rawFulfillment === "pickup" ? "pickup" : "delivery";
+
+  const cookies = parseCookieHeader(req.headers?.cookie);
+  let rawOk: string | undefined;
+  try {
+    rawOk = cookies[CH_OK] ? decodeURIComponent(cookies[CH_OK]) : undefined;
+  } catch {
+    rawOk = cookies[CH_OK];
+  }
+  const ok: OkPayload | null = verifyOkCookie(rawOk);
+  if (!ok) {
+    res.status(401).json({ error: "Complete email verification first (request a code, then enter it)" });
+    return;
+  }
+  if (checkoutType !== "bobcat" && checkoutType !== "regular") {
+    res.status(400).json({ error: "Missing checkout type" });
+    return;
+  }
+  if (ok.f !== checkoutType) {
+    res.status(400).json({ error: "Checkout type does not match verified code" });
+    return;
+  }
+  if (checkoutType === "bobcat") {
+    if (!bobcat?.name?.trim() || !bobcat?.grade?.trim() || !bobcat?.bobcatEmail?.trim()) {
+      res.status(400).json({ error: "Bobcat: name, grade, and school email are required" });
+      return;
+    }
+  } else {
+    if (!regular?.name?.trim() || !regular?.homeAddress?.trim() || !regular?.email?.trim()) {
+      res.status(400).json({ error: "Regular: name, home address, and email are required" });
+      return;
+    }
+  }
   if (!baseUrl) {
     res.status(400).json({ error: "Missing baseUrl" });
     return;
@@ -89,12 +141,29 @@ export default async function handler(
     const shippingOptions = getShippingOptions();
     const pickupFormCartUrl = `${origin}/cart#school-pickup-cart`;
 
+    const meta: NonNullable<Stripe.Checkout.SessionCreateParams["metadata"]> = {
+      code_verified_email: truncate(ok.e, 500),
+      checkout_type: checkoutType,
+      fulfillment,
+    };
+    if (checkoutType === "bobcat" && bobcat) {
+      meta.bobcat_name = truncate(bobcat.name.trim(), 500);
+      meta.bobcat_grade = truncate(bobcat.grade.trim(), 500);
+      meta.bobcat_school_email = truncate(bobcat.bobcatEmail.trim(), 500);
+    }
+    if (checkoutType === "regular" && regular) {
+      meta.regular_name = truncate(regular.name.trim(), 500);
+      meta.regular_home_address = truncate(regular.homeAddress.trim(), 500);
+      meta.regular_email = truncate(regular.email.trim(), 500);
+    }
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       line_items,
       phone_number_collection: { enabled: true },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
+      metadata: meta,
     };
 
     if (fulfillment === "delivery") {
@@ -114,6 +183,7 @@ export default async function handler(
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
+    clearCookie(res, CH_OK);
 
     res.setHeader("Content-Type", "application/json");
     res.status(200).json({ url: session.url });
