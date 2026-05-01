@@ -21,7 +21,7 @@ type Body = {
   /** Bobcat flow */
   bobcat?: { name: string; grade: string; bobcatEmail: string };
   /** Regular (friends) flow */
-  regular?: { name: string; homeAddress: string; email: string };
+  regular?: { name: string; email: string };
 };
 
 type HandlerReq = {
@@ -92,8 +92,8 @@ export default async function handler(
       return;
     }
   } else {
-    if (!regular?.name?.trim() || !regular?.homeAddress?.trim() || !regular?.email?.trim()) {
-      res.status(400).json({ error: "Regular: name, home address, and email are required" });
+    if (!regular?.name?.trim() || !regular?.email?.trim()) {
+      res.status(400).json({ error: "Regular pickup: name and email are required" });
       return;
     }
   }
@@ -153,7 +153,6 @@ export default async function handler(
     }
     if (checkoutType === "regular" && regular) {
       meta.regular_name = truncate(regular.name.trim(), 500);
-      meta.regular_home_address = truncate(regular.homeAddress.trim(), 500);
       meta.regular_email = truncate(regular.email.trim(), 500);
     }
 
@@ -163,6 +162,7 @@ export default async function handler(
       phone_number_collection: { enabled: true },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
+      customer_email: ok.e,
       metadata: meta,
     };
 

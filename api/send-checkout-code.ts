@@ -62,7 +62,7 @@ export default async function handler(req: Req, res: Res) {
   }
   setCookie(res, CH_PENDING, token, 15 * 60);
 
-  const label = flowType === "bobcat" ? "Bobcat (school) checkout" : "Regular / friends checkout";
+  const label = flowType === "bobcat" ? "Bobcat (school) checkout" : "Regular pickup";
   const text = [
     `Your ${label} verification code is: ${code}`,
     "",

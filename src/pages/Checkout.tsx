@@ -49,7 +49,7 @@ export default function Checkout() {
   const [emailForCode, setEmailForCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [bobcat, setBobcat] = useState({ name: "", grade: "", bobcatEmail: "" });
-  const [regular, setRegular] = useState({ name: "", homeAddress: "", email: "" });
+  const [regular, setRegular] = useState({ name: "", email: "" });
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -117,8 +117,19 @@ export default function Checkout() {
         body: JSON.stringify({ email: emailForCode, flowType }),
       });
       if (!res.ok) {
-        const d = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(d.error || "Could not send code");
+        const raw = await res.text();
+        let msg = "Could not send code";
+        try {
+          const d = JSON.parse(raw) as { error?: string };
+          if (d.error) msg = d.error;
+        } catch {
+          if (res.status === 404) {
+            msg = "API route not found. If testing locally, use Vercel deployment or `vercel dev`.";
+          } else if (raw.trim()) {
+            msg = raw.slice(0, 200);
+          }
+        }
+        throw new Error(msg);
       }
       setStep("code");
     } catch (e) {
@@ -161,8 +172,8 @@ export default function Checkout() {
         return;
       }
     } else {
-      if (!regular.name.trim() || !regular.homeAddress.trim() || !regular.email.trim()) {
-        setErr("Fill in name, home address, and email.");
+      if (!regular.name.trim() || !regular.email.trim()) {
+        setErr("Fill in name and email.");
         return;
       }
     }
@@ -184,7 +195,7 @@ export default function Checkout() {
       if (flowType === "bobcat") {
         body.bobcat = { name: bobcat.name, grade: bobcat.grade, bobcatEmail: bobcat.bobcatEmail };
       } else {
-        body.regular = { name: regular.name, homeAddress: regular.homeAddress, email: regular.email };
+        body.regular = { name: regular.name, email: regular.email };
       }
 
       const res = await fetch("/api/create-checkout-session", {
@@ -264,7 +275,7 @@ export default function Checkout() {
             }}
             className="w-full rounded-xl border-2 border-slate-200 bg-white p-4 text-left font-semibold text-slate-900 hover:bg-slate-50"
           >
-            Regular / friends checkout
+            Regular pickup
           </button>
         </div>
       )}
@@ -272,12 +283,12 @@ export default function Checkout() {
       {step === "email" && flowType && (
         <div className="space-y-4">
           <p className="text-sm text-slate-600">
-            Enter an email to receive a one-time code. Bobcat and friends checkout use different
-            code emails.
+            Enter the buyer email. We will send a one-time code here, and after verification this
+            same email is passed into payment as the buyer email.
           </p>
           <div>
             <label htmlFor="cemail" className="mb-1 block text-sm font-medium text-slate-700">
-              Email
+              Buyer email
             </label>
             <input
               id="cemail"
@@ -362,22 +373,13 @@ export default function Checkout() {
 
       {step === "form" && flowType === "regular" && (
         <div className="space-y-3">
-          <h2 className="font-bold text-slate-900">Your details</h2>
+          <h2 className="font-bold text-slate-900">Regular pickup details</h2>
           <div>
             <label className="text-sm font-medium">Name</label>
             <input
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={regular.name}
               onChange={(e) => setRegular((r) => ({ ...r, name: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">Home address</label>
-            <textarea
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              rows={3}
-              value={regular.homeAddress}
-              onChange={(e) => setRegular((r) => ({ ...r, homeAddress: e.target.value }))}
             />
           </div>
           <div>
