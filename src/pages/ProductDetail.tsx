@@ -65,7 +65,7 @@ export default function ProductDetail() {
     return (
       <div className="max-w-6xl mx-auto px-4 py-16 text-center">
         <p className="text-slate-600 mb-4">Product not found.</p>
-        <Link to="/shop" className="text-unicef-blue font-semibold">
+        <Link to="/shop" className="text-brand-blue font-semibold">
           Back to shop
         </Link>
       </div>
@@ -93,13 +93,13 @@ export default function ProductDetail() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <Link to="/shop" className="text-sm text-unicef-blue hover:underline mb-8 inline-block">
+      <Link to="/shop" className="text-sm text-brand-blue hover:underline mb-8 inline-block">
         ← Back to shop
       </Link>
       <div className="grid md:grid-cols-2 gap-12 items-start">
         <ProductImageSlider product={product} className="aspect-square" />
         <div>
-          <span className="text-sm font-medium text-unicef-dark">{product.category}</span>
+          <span className="text-sm font-medium text-brand-blue-dark">{product.category}</span>
           <h1 className="text-3xl font-bold text-slate-900 mt-2">{product.title}</h1>
           {averageRating !== null && (
             <p className="mt-2 text-sm text-slate-600">
@@ -111,7 +111,7 @@ export default function ProductDetail() {
           <p className="mt-6 text-2xl font-bold text-slate-900">
             {product.currency} {product.price}
           </p>
-          <p className="mt-2 text-sm text-unicef-dark">
+          <p className="mt-2 text-sm text-brand-blue-dark">
             {product.donationPercent}% of this item is pledged to support donation efforts aligned with UNICEF values.
           </p>
           <div className="mt-6">
@@ -126,14 +126,14 @@ export default function ProductDetail() {
             <button
               type="button"
               onClick={handleAddToCart}
-              className="w-full md:w-auto border-2 border-unicef-blue text-unicef-blue px-8 py-3 rounded-full font-semibold hover:bg-unicef-blue/10 transition"
+              className="w-full md:w-auto border-2 border-brand-blue text-brand-blue px-8 py-3 rounded-full font-semibold hover:bg-brand-blue/10 transition"
             >
               {added ? "Added to cart ✓" : "Add to cart"}
             </button>
             <button
               type="button"
               onClick={handleBuyNow}
-              className="w-full md:w-auto bg-unicef-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-unicef-dark transition"
+              className="w-full md:w-auto bg-brand-blue text-white px-8 py-3 rounded-full font-semibold hover:bg-brand-blue-dark transition"
             >
               Buy now
             </button>

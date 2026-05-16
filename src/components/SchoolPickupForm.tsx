@@ -1,9 +1,7 @@
 import { useState } from "react";
 
 type SchoolPickupFormProps = {
-  /** Anchor id for deep links (e.g. #school-pickup on About). */
   sectionId?: string;
-  /** Suffix for input ids so multiple forms on the site stay unique (e.g. "cart"). */
   idSuffix?: string;
   className?: string;
 };
@@ -21,20 +19,20 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
   return (
     <section
       id={sectionId}
-      className={`rounded-2xl border border-emerald-300 bg-emerald-50 p-6 shadow-sm ${sectionId ? "scroll-mt-24" : ""} ${className}`.trim()}
+      className={`rounded-2xl border border-sky-300 bg-sky-50 p-6 shadow-sm ${sectionId ? "scroll-mt-24" : ""} ${className}`.trim()}
     >
-      <h2 className="text-xl font-bold text-emerald-900 md:text-2xl">School pickup form</h2>
-      <p className="mt-2 text-sm text-emerald-800">
+      <h2 className="text-xl font-bold text-sky-900 md:text-2xl">School pickup form</h2>
+      <p className="mt-2 text-sm text-sky-800">
         For school pickup, share your full name, grade, and parent email.
       </p>
       {pickupSubmitted && (
-        <p className="mt-4 rounded-lg bg-emerald-200 px-3 py-2 text-sm font-medium text-emerald-900">
+        <p className="mt-4 rounded-lg bg-sky-200 px-3 py-2 text-sm font-medium text-sky-900">
           Thanks! Your pickup details were submitted.
         </p>
       )}
       <form className="mt-5 space-y-4" onSubmit={handlePickupSubmit}>
         <div>
-          <label htmlFor={`pickupName${suf}`} className="mb-1 block text-sm font-semibold text-emerald-900">
+          <label htmlFor={`pickupName${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
             Full name
           </label>
           <input
@@ -42,12 +40,12 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
             name="pickupName"
             type="text"
             required
-            className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
+            className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
             placeholder="Student name"
           />
         </div>
         <div>
-          <label htmlFor={`pickupGrade${suf}`} className="mb-1 block text-sm font-semibold text-emerald-900">
+          <label htmlFor={`pickupGrade${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
             Grade
           </label>
           <input
@@ -55,12 +53,12 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
             name="pickupGrade"
             type="text"
             required
-            className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
+            className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
             placeholder="Grade level"
           />
         </div>
         <div>
-          <label htmlFor={`pickupEmail${suf}`} className="mb-1 block text-sm font-semibold text-emerald-900">
+          <label htmlFor={`pickupEmail${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
             Parent Email
           </label>
           <input
@@ -68,13 +66,13 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
             name="pickupEmail"
             type="email"
             required
-            className="w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-slate-800 outline-none ring-emerald-400 focus:ring-2"
+            className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
             placeholder="parent@example.com"
           />
         </div>
         <button
           type="submit"
-          className="w-full rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white transition hover:bg-emerald-700 sm:w-auto"
+          className="w-full rounded-full bg-brand-blue px-6 py-2.5 font-semibold text-white transition hover:bg-brand-blue-dark sm:w-auto"
         >
           Submit pickup details
         </button>

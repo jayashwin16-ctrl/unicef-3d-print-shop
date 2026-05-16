@@ -8,7 +8,7 @@ export default function CheckoutPaymentError() {
         <p className="mt-3 text-red-800">Something went wrong when starting or completing payment. Please try again.</p>
         <Link
           to="/checkout"
-          className="mt-6 inline-block rounded-full bg-unicef-blue px-6 py-3 font-semibold text-white hover:bg-unicef-dark"
+          className="mt-6 inline-block rounded-full bg-brand-blue px-6 py-3 font-semibold text-white hover:bg-brand-blue-dark"
         >
           Back to checkout
         </Link>

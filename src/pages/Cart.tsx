@@ -17,7 +17,7 @@ export default function Cart() {
           <p className="text-slate-600 mb-8">Add items from the shop to checkout.</p>
           <Link
             to="/shop"
-            className="inline-block bg-unicef-blue text-white px-6 py-3 rounded-full font-semibold hover:bg-unicef-dark transition"
+            className="inline-block bg-brand-blue text-white px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-dark transition"
           >
             Browse shop
           </Link>
@@ -25,7 +25,7 @@ export default function Cart() {
         <div className="max-w-xl mx-auto space-y-4">
           <p className="text-center text-sm text-slate-600">
             Picking up at school? You can still fill out the form below, or see the{" "}
-            <Link to="/about#school-pickup" className="font-semibold text-unicef-blue underline">
+            <Link to="/about#school-pickup" className="font-semibold text-brand-blue underline">
               About page
             </Link>
             .
@@ -58,7 +58,7 @@ export default function Cart() {
           )}
         </Link>
         <div className="flex-1 min-w-0">
-          <Link to={`/product/${productId}`} className="font-semibold text-slate-900 hover:text-unicef-blue">
+          <Link to={`/product/${productId}`} className="font-semibold text-slate-900 hover:text-brand-blue">
             {product.title}
           </Link>
           <p className="text-slate-600 text-sm mt-0.5">
@@ -132,7 +132,7 @@ export default function Cart() {
                         if (itemCount === 0) return;
                         navigate("/checkout", { state: { fromCart: true, fulfillment: "pickup" } });
                       }}
-                      className="px-6 py-2.5 rounded-full border-2 border-emerald-600 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+                      className="px-6 py-2.5 rounded-full border-2 border-brand-blue bg-brand-blue text-white font-semibold hover:bg-brand-blue-dark transition"
                     >
                       Get in person
                     </button>
@@ -143,7 +143,7 @@ export default function Cart() {
                         if (itemCount === 0) return;
                         navigate("/checkout", { state: { fromCart: true, fulfillment: "delivery" } });
                       }}
-                      className="px-6 py-2.5 rounded-full bg-unicef-blue text-white font-semibold hover:bg-unicef-dark transition"
+                      className="px-6 py-2.5 rounded-full bg-brand-blue text-white font-semibold hover:bg-brand-blue-dark transition"
                     >
                       Delivered to you
                     </button>

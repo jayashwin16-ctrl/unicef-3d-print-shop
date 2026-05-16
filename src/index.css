@@ -3,5 +3,27 @@
 @tailwind utilities;
 
 body {
-  @apply antialiased text-slate-800 bg-slate-50;
+  @apply antialiased font-sans text-[#333] bg-brand-bg;
+}
+
+@layer components {
+  .section-label {
+    @apply text-center text-[11px] uppercase tracking-[0.2em] text-brand-blue-dark mb-2;
+  }
+
+  .section-title {
+    @apply text-center text-[22px] font-bold text-brand-heading mb-6;
+  }
+
+  .btn-primary {
+    @apply inline-block rounded-md bg-brand-blue px-7 py-3 text-sm font-bold text-white transition hover:opacity-90;
+  }
+
+  .btn-outline {
+    @apply inline-block rounded-md border border-white/90 bg-white/90 px-7 py-3 text-sm font-bold text-brand-heading transition hover:opacity-90;
+  }
+
+  .btn-yellow {
+    @apply inline-block rounded-md bg-brand-blue-dark px-10 py-4 text-base font-bold text-white transition hover:opacity-90;
+  }
 }

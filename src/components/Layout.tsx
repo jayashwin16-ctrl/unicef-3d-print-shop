@@ -1,36 +1,85 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+
+const NAV = [
+  { path: "/", label: "Home" },
+  { path: "/problem", label: "The Problem" },
+  { path: "/stats", label: "Stats & Data" },
+  { path: "/why", label: "Why UNICEF" },
+  { path: "/shop", label: "Shop" },
+] as const;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const loc = useLocation();
   const { itemCount } = useCart();
-  const nav = (path: string) =>
-    loc.pathname === path
-      ? "text-[#1CABE2] font-semibold"
-      : "text-slate-600 hover:text-[#374EA2]";
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const linkClass = (path: string) => {
+    const active = loc.pathname === path;
+    return active
+      ? "border-b-2 border-brand-blue pb-0.5 font-semibold text-brand-heading"
+      : "text-brand-muted hover:text-brand-heading";
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1CABE2]/85 via-sky-100/80 to-[#FFC20E]/50">
-      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1CABE2] to-[#374EA2] flex items-center justify-center text-white font-bold text-sm">
-              3D
-            </span>
-            <span className="font-bold text-slate-800 text-lg">Prints for UNICEF</span>
+    <div className="flex min-h-screen flex-col bg-brand-bg">
+      <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-card px-4 py-3.5 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <Link to="/" className="text-[17px] font-bold text-brand-blue">
+            Prints for UNICEF
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <Link to="/" className={nav("/")}>Home</Link>
-            <Link to="/shop" className={nav("/shop")}>Shop</Link>
-            <Link to="/about" className={nav("/about")}>About</Link>
-            <Link to="/cart" className="relative flex items-center gap-1.5 text-slate-600 hover:text-[#374EA2]">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          <button
+            type="button"
+            className="text-2xl text-brand-heading md:hidden"
+            aria-label="Toggle menu"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            ☰
+          </button>
+          <nav
+            className={`${
+              menuOpen ? "flex" : "hidden"
+            } absolute left-0 right-0 top-full flex-col gap-4 border-b border-brand-border bg-brand-card px-6 py-4 text-sm md:static md:flex md:flex-row md:items-center md:border-0 md:p-0`}
+          >
+            <ul className="flex flex-col gap-4 md:flex-row md:items-center md:gap-5">
+              {NAV.map(({ path, label }) => (
+                <li key={path}>
+                  <Link to={path} className={linkClass(path)} onClick={() => setMenuOpen(false)}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  to="/donate"
+                  className={`rounded-md px-3.5 py-1.5 font-bold text-white ${
+                    loc.pathname === "/donate"
+                      ? "bg-brand-blue-dark"
+                      : "bg-brand-blue hover:opacity-90"
+                  }`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Donate
+                </Link>
+              </li>
+            </ul>
+            <Link
+              to="/cart"
+              className="relative flex items-center gap-1.5 text-brand-muted hover:text-brand-heading"
+              onClick={() => setMenuOpen(false)}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
               </svg>
-              <span>Cart</span>
+              Cart
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[1.25rem] h-5 px-1 flex items-center justify-center rounded-full bg-[#1CABE2] text-white text-xs font-semibold">
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brand-blue px-1 text-xs font-semibold text-white">
                   {itemCount}
                 </span>
               )}
@@ -39,19 +88,24 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="bg-[#374EA2] text-white mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <p className="text-sm text-blue-100 mb-2">
-            A portion of every purchase is pledged to support children through donation efforts.
-          </p>
-          <p className="text-xs text-blue-200/80">
-            Independent site. For direct UNICEF donations visit{" "}
-            <a href="https://www.unicef.org" target="_blank" rel="noopener noreferrer" className="underline text-[#FFC20E]">
-              unicef.org
-            </a>
-            . Comply with official branding if partnering with UNICEF.
-          </p>
-        </div>
+      <footer className="border-t border-brand-border bg-brand-card px-6 py-5 text-center">
+        <p className="text-xs text-brand-dim">
+          Prints for UNICEF — Student-led 3D print shop · Pledged giving aligned with UNICEF values
+        </p>
+        <p className="mt-2 text-xs text-brand-dim">
+          <Link to="/about" className="underline hover:text-brand-heading">
+            About & school pickup
+          </Link>
+          {" · "}
+          <a
+            href="https://www.unicef.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-brand-heading"
+          >
+            unicef.org
+          </a>
+        </p>
       </footer>
     </div>
   );

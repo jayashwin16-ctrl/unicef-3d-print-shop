@@ -3,6 +3,10 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import About from "./pages/About";
+import Problem from "./pages/Problem";
+import Stats from "./pages/Stats";
+import WhyUnicef from "./pages/WhyUnicef";
+import Donate from "./pages/Donate";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -15,6 +19,10 @@ export default function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/problem" element={<Problem />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/why" element={<WhyUnicef />} />
+        <Route path="/donate" element={<Donate />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/about" element={<About />} />

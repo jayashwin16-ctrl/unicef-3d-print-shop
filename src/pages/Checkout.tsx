@@ -237,14 +237,14 @@ export default function Checkout() {
             <button
               type="button"
               onClick={() => goFulfillment("pickup")}
-              className="rounded-full border-2 border-emerald-600 bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700"
+              className="rounded-full border-2 border-brand-blue bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
             >
               Get in person
             </button>
             <button
               type="button"
               onClick={() => goFulfillment("delivery")}
-              className="rounded-full bg-unicef-blue px-5 py-3 font-semibold text-white hover:bg-unicef-dark"
+              className="rounded-full bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
             >
               Delivered to you
             </button>
@@ -303,7 +303,7 @@ export default function Checkout() {
             type="button"
             disabled={sending}
             onClick={sendCode}
-            className="w-full rounded-full bg-unicef-blue py-3 font-semibold text-white disabled:opacity-50"
+            className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white disabled:opacity-50"
           >
             {sending ? "Sending…" : "Send me the code"}
           </button>
@@ -326,7 +326,7 @@ export default function Checkout() {
             type="button"
             disabled={verifying || codeInput.length !== 6}
             onClick={verifyCode}
-            className="w-full rounded-full bg-unicef-blue py-3 font-semibold text-white disabled:opacity-50"
+            className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white disabled:opacity-50"
           >
             {verifying ? "Verifying…" : "Verify code"}
           </button>
@@ -364,7 +364,7 @@ export default function Checkout() {
           <button
             type="button"
             onClick={() => setStep("pay")}
-            className="mt-2 w-full rounded-full bg-unicef-blue py-3 font-semibold text-white"
+            className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
           >
             Continue to payment
           </button>
@@ -394,7 +394,7 @@ export default function Checkout() {
           <button
             type="button"
             onClick={() => setStep("pay")}
-            className="mt-2 w-full rounded-full bg-unicef-blue py-3 font-semibold text-white"
+            className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
           >
             Continue to payment
           </button>
@@ -408,14 +408,14 @@ export default function Checkout() {
             type="button"
             disabled={paying}
             onClick={goPay}
-            className="w-full rounded-full bg-emerald-600 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-50"
           >
             {paying ? "Redirecting…" : "Pay now with card"}
           </button>
         </div>
       )}
 
-      <Link to="/cart" className="mt-8 inline-block text-sm text-unicef-blue hover:underline">
+      <Link to="/cart" className="mt-8 inline-block text-sm text-brand-blue hover:underline">
         ← Back to cart
       </Link>
     </div>

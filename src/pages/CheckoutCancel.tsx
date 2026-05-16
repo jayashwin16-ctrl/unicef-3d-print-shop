@@ -10,7 +10,7 @@ export default function CheckoutCancel() {
         </p>
         <Link
           to="/shop"
-          className="inline-block bg-unicef-blue text-white px-6 py-3 rounded-full font-semibold hover:bg-unicef-dark transition"
+          className="inline-block rounded-full bg-brand-blue px-6 py-3 font-semibold text-white transition hover:bg-brand-blue-dark"
         >
           Back to shop
         </Link>
