@@ -71,7 +71,7 @@ export default function WhyUnicef() {
             >
               unicef.org
             </a>
-            —or buy a 3D print from us. We pledge 30–40% of each product&apos;s price toward
+            —or buy a 3D print from us. We pledge about 50% of each product&apos;s price toward
             children-focused giving.
           </p>
           <p>

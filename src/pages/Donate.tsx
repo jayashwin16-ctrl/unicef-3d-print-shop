@@ -25,7 +25,7 @@ export default function Donate() {
 
       <Section>
         <p className="mx-auto mb-8 max-w-lg text-center text-base text-[#333]">
-          Every purchase pledges 30–40% toward children-focused giving aligned with UNICEF values.
+          Every purchase pledges about 50% toward children-focused giving aligned with UNICEF values.
           Pick a print below—or give directly through UNICEF.
         </p>
 

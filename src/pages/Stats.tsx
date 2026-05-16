@@ -31,7 +31,7 @@ const FACTS = [
   },
   {
     number: "Your $",
-    text: "Every purchase from our shop pledges 30–40% toward children-focused giving.",
+    text: "Every purchase from our shop pledges about 50% toward children-focused giving.",
     source: "Prints for UNICEF shop policy",
   },
 ];
@@ -83,7 +83,7 @@ export default function Stats() {
             percentage of that sale we set aside for giving aligned with UNICEF&apos;s values.
           </p>
           <p>
-            Buying a $10 fidget can mean $4 pledged. Buying a $28 figure can mean $8+ pledged. Small
+            Buying a $10 fidget can mean $5 pledged. Buying a $28 figure can mean $14 pledged. Small
             purchases add up when many people participate.
           </p>
         </div>

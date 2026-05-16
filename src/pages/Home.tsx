@@ -49,7 +49,7 @@ export default function Home() {
         stats={[
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
           { value: "7", label: "UNICEF regional offices", tone: "dark" },
-          { value: "30–40%", label: "Pledged from each sale", tone: "green" },
+          { value: "~50%", label: "Pledged from each sale", tone: "green" },
           { value: "$10+", label: "Prints that make a difference", tone: "dark" },
         ]}
       />
