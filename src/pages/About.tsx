@@ -25,28 +25,26 @@ export default function About() {
         subtitle="Student-led 3D printing with a pledge to help children through UNICEF-aligned giving."
       />
 
-      <Section label="Our story" title="Meet the maker">
+      <Section label="About this shop" title="What we do">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            Hello, my name is Jay Ashwin. I go to school at Open Window School. I am in fourth grade
-            and I am 10 years old. This project is about selling 3D prints and donating to UNICEF
-            using the money we get from our 3D prints sold.
+            This shop sells 3D-printed items and donates part of the proceeds to support children.
+            We like 3D printing because it is creative and rewarding without being out of reach for
+            students running the project.
           </p>
           <p>
-            I chose making 3D prints because 3D prints are very cool and they also take some skill to
-            make, but they are not too hard. I chose UNICEF as the organization I am donating to
-            because they are special by being the only U.N. agency dedicated exclusively to
-            children.
+            We support giving aligned with UNICEF&apos;s mission because UNICEF is the only U.N.
+            agency dedicated exclusively to children—focused on health, education, and protection
+            worldwide.
           </p>
           <p>
-            We hope you like our products and give us feedback on what we should improve on! We also
-            hope you like our website and recommend it to other people. This is 3D Prints for Good
-            saying bye! Happy shopping!
+            We hope you enjoy our products and this website. Share feedback anytime, and tell others
+            about 3D Prints for Good. Happy shopping!
           </p>
         </div>
       </Section>
 
-      <Section title="How the shop works today" alt>
+      <Section title="How the shop works" alt>
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
             Every item in our shop is 3D-printed in durable PLA. We pledge about{" "}
