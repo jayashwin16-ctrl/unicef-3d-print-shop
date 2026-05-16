@@ -124,7 +124,8 @@ export default function Checkout() {
           if (d.error) msg = d.error;
         } catch {
           if (res.status === 404) {
-            msg = "API route not found. If testing locally, use Vercel deployment or `vercel dev`.";
+            msg =
+              "API route not found. Run npm run dev (starts Vercel + API). UI-only: npm run dev:vite won't load /api.";
           } else if (raw.trim()) {
             msg = raw.slice(0, 200);
           }

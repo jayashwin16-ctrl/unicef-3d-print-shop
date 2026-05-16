@@ -6,12 +6,15 @@ import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
 
-const COUNTRIES = [
-  { flag: "🇧🇩", name: "Bangladesh" },
-  { flag: "🇧🇹", name: "Bhutan" },
-  { flag: "🇮🇳", name: "India" },
-  { flag: "🇵🇰", name: "Pakistan" },
-  { flag: "🇱🇰", name: "Sri Lanka" },
+/** UNICEF’s seven regional offices (where much of their field work is organized). */
+const UNICEF_REGIONS = [
+  { icon: "🌏", name: "East Asia & Pacific" },
+  { icon: "🌍", name: "Eastern & Southern Africa" },
+  { icon: "🏔️", name: "Europe & Central Asia" },
+  { icon: "🌎", name: "Latin America & Caribbean" },
+  { icon: "🕌", name: "Middle East & North Africa" },
+  { icon: "🪷", name: "South Asia" },
+  { icon: "🌍", name: "West & Central Africa" },
 ];
 
 export default function Home() {
@@ -45,7 +48,7 @@ export default function Home() {
       <StatsBar
         stats={[
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
-          { value: "5", label: "Regions we highlight", tone: "dark" },
+          { value: "7", label: "UNICEF regional offices", tone: "dark" },
           { value: "30–40%", label: "Pledged from each sale", tone: "green" },
           { value: "$10+", label: "Prints that make a difference", tone: "dark" },
         ]}
@@ -78,15 +81,19 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section title="Regions We Talk About" alt>
+      <Section title="Regions UNICEF Focuses On" alt>
+        <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
+          UNICEF works in more than 190 countries. Most programs are run through seven regional
+          offices around the world.
+        </p>
         <div className="flex flex-wrap justify-center gap-3">
-          {COUNTRIES.map((c) => (
+          {UNICEF_REGIONS.map((r) => (
             <div
-              key={c.name}
-              className="w-[120px] rounded-lg border border-brand-border bg-brand-bg px-4 py-5 text-center transition hover:-translate-y-1 hover:border-brand-blue"
+              key={r.name}
+              className="w-[140px] rounded-lg border border-brand-border bg-brand-bg px-3 py-5 text-center transition hover:-translate-y-1 hover:border-brand-blue"
             >
-              <div className="text-[28px]">{c.flag}</div>
-              <div className="mt-1.5 text-xs font-bold text-[#333]">{c.name}</div>
+              <div className="text-[28px]">{r.icon}</div>
+              <div className="mt-1.5 text-xs font-bold leading-snug text-[#333]">{r.name}</div>
             </div>
           ))}
         </div>

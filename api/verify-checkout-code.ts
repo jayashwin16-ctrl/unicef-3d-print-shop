@@ -9,6 +9,7 @@ import {
   type OkPayload,
 } from "./checkout-cookies";
 import { getCookieValue, jsonResponse, methodNotAllowed } from "./http";
+import { createPostHandler } from "./vercel-bridge";
 
 export const runtime = "nodejs";
 
@@ -60,3 +61,5 @@ export async function POST(request: Request): Promise<Response> {
 export function GET(): Response {
   return methodNotAllowed();
 }
+
+export default createPostHandler(POST);
