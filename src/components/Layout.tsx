@@ -8,6 +8,7 @@ const NAV = [
   { path: "/stats", label: "Stats & Data" },
   { path: "/why", label: "Why UNICEF" },
   { path: "/shop", label: "Shop" },
+  { path: "/about", label: "About" },
 ] as const;
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -27,7 +28,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-card px-4 py-3.5 md:px-8">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <Link to="/" className="text-[17px] font-bold text-brand-blue">
-            Prints for UNICEF
+            3D Prints for Good
           </Link>
           <button
             type="button"
@@ -90,7 +91,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
       <footer className="border-t border-brand-border bg-brand-card px-6 py-5 text-center">
         <p className="text-xs text-brand-dim">
-          Prints for UNICEF — Student-led 3D print shop · Pledged giving aligned with UNICEF values
+          3D Prints for Good — Student-led 3D print shop · Pledged giving aligned with UNICEF values
         </p>
         <p className="mt-2 text-xs text-brand-dim">
           <Link to="/about" className="underline hover:text-brand-heading">
