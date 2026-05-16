@@ -3,50 +3,37 @@ import {
   CH_PENDING,
   formatClearCookieHeader,
   formatSetCookieHeader,
-  parseCookieHeader,
   safeCodeEqual,
   signOk,
   verifyPendingCookie,
   type OkPayload,
 } from "./checkout-cookies";
-import { readJsonBody, type ReqWithBody } from "./read-json-body";
+import { getCookieValue, jsonResponse, methodNotAllowed } from "./http";
 
-declare const process: { env: Record<string, string | undefined> };
+export const runtime = "nodejs";
 
 type Body = { code?: string };
 
-type Req = ReqWithBody & { method?: string; headers?: { cookie?: string } };
-type Res = { status: (n: number) => { json: (o: object) => void }; setHeader: (k: string, v: string | string[] | number) => void };
-
-export default async function handler(req: Req, res: Res) {
+export async function POST(request: Request): Promise<Response> {
   try {
-    if (req.method !== "POST") {
-      res.status(405).json({ error: "Method not allowed" });
-      return;
-    }
-
-    const { code: rawCode } = await readJsonBody<Body>(req);
-    const code = (rawCode || "").trim();
-    if (!/^\d{6}$/.test(code)) {
-      res.status(400).json({ error: "Enter the 6-digit code from your email" });
-      return;
-    }
-
-    const cookies = parseCookieHeader(req.headers?.cookie);
-    let raw: string | undefined;
+    let body: Body;
     try {
-      raw = cookies[CH_PENDING] ? decodeURIComponent(cookies[CH_PENDING]) : undefined;
+      body = (await request.json()) as Body;
     } catch {
-      raw = cookies[CH_PENDING];
+      return jsonResponse({ error: "Invalid JSON body" }, 400);
     }
-    const pending = verifyPendingCookie(raw);
+
+    const code = (body.code || "").trim();
+    if (!/^\d{6}$/.test(code)) {
+      return jsonResponse({ error: "Enter the 6-digit code from your email" }, 400);
+    }
+
+    const pending = verifyPendingCookie(getCookieValue(request, CH_PENDING));
     if (!pending) {
-      res.status(400).json({ error: "Code expired or step missing. Request a new code." });
-      return;
+      return jsonResponse({ error: "Code expired or step missing. Request a new code." }, 400);
     }
     if (!safeCodeEqual(pending.c, code)) {
-      res.status(400).json({ error: "Incorrect code" });
-      return;
+      return jsonResponse({ error: "Incorrect code" }, 400);
     }
 
     const exp = Date.now() + 60 * 60 * 1000;
@@ -56,16 +43,20 @@ export default async function handler(req: Req, res: Res) {
       token = signOk(ok);
     } catch (err) {
       console.error("verify-checkout-code config error:", err);
-      res.status(500).json({ error: "Server is not configured (CHECKOUT_SESSION_SECRET)" });
-      return;
+      return jsonResponse({ error: "Server is not configured (CHECKOUT_SESSION_SECRET)" }, 500);
     }
-    res.setHeader("Set-Cookie", [formatClearCookieHeader(CH_PENDING), formatSetCookieHeader(CH_OK, token, 60 * 60)]);
 
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ ok: true, flowType: pending.f });
+    return jsonResponse({ ok: true, flowType: pending.f }, 200, [
+      formatClearCookieHeader(CH_PENDING),
+      formatSetCookieHeader(CH_OK, token, 60 * 60),
+    ]);
   } catch (err) {
     console.error("verify-checkout-code unhandled:", err);
     const msg = err instanceof Error ? err.message : "Server error";
-    res.status(500).json({ error: msg });
+    return jsonResponse({ error: msg }, 500);
   }
+}
+
+export function GET(): Response {
+  return methodNotAllowed();
 }

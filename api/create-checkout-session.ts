@@ -1,8 +1,13 @@
 import Stripe from "stripe";
-import { CH_OK, clearCookie, parseCookieHeader, verifyOkCookie, type OkPayload } from "./checkout-cookies";
-import { readJsonBody, type ReqWithBody } from "./read-json-body";
+import {
+  CH_OK,
+  formatClearCookieHeader,
+  verifyOkCookie,
+  type OkPayload,
+} from "./checkout-cookies";
+import { getCookieValue, jsonResponse, methodNotAllowed } from "./http";
 
-declare const process: { env: Record<string, string | undefined> };
+export const runtime = "nodejs";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -15,19 +20,10 @@ type Body = {
   productId?: string;
   quantity?: number;
   items?: { productId: string; quantity: number }[];
-  /** pickup = in person (no Stripe shipping). delivery = ship to address. */
   fulfillment?: "pickup" | "delivery";
-  /** Must match verified email code step */
   checkoutType?: "bobcat" | "regular";
-  /** Bobcat flow */
   bobcat?: { name: string; grade: string; bobcatEmail: string };
-  /** Regular (friends) flow */
   regular?: { name: string; email: string };
-};
-
-type HandlerReq = ReqWithBody & {
-  method?: string;
-  headers?: { cookie?: string };
 };
 
 function truncate(s: string, max: number): string {
@@ -52,82 +48,68 @@ function getShippingOptions(): Stripe.Checkout.SessionCreateParams.ShippingOptio
   return options.length > 0 ? options : undefined;
 }
 
-export default async function handler(
-  req: HandlerReq,
-  res: { status: (n: number) => { json: (o: object) => void }; setHeader: (a: string, b: string | string[] | number) => void }
-) {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method not allowed" });
-    return;
-  }
+function getProduct(id: string): { title: string; description?: string; price: number; currency: string; image?: string } | null {
+  const products: Record<string, { title: string; description?: string; price: number; currency: string; image?: string }> = {
+    "1": { title: "3D printed egg fidget", description: "Satisfying 3D-printed egg fidget toy.", price: 10, currency: "usd", image: "/Photos/egg-fidget-2.jpg" },
+    "2": { title: "3D printed Samurai Sword", description: "Detailed 3D-printed samurai sword replica.", price: 20, currency: "usd", image: "/Photos/samurai-sword-2.jpg" },
+    "3": { title: "Articulated dragon", description: "Flexible articulated dragon figure.", price: 18, currency: "usd", image: "/Photos/articulated-dragon.jpg" },
+    "4": { title: "Shiny dragon", description: "Beautiful shiny dragon figure.", price: 28, currency: "usd", image: "/Photos/shiny-dragon.jpg" },
+    "5": { title: "Skull pass-through toy", description: "Unique 3D-printed skull with pass-through design.", price: 16, currency: "usd", image: "/Photos/skull-pass-through-2.jpg" },
+  };
+  return products[id] ?? null;
+}
 
+export async function POST(request: Request): Promise<Response> {
   let body: Body;
   try {
-    body = await readJsonBody<Body>(req);
+    body = (await request.json()) as Body;
   } catch {
-    res.status(400).json({ error: "Invalid JSON body" });
-    return;
+    return jsonResponse({ error: "Invalid JSON body" }, 400);
   }
-  const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment, checkoutType, bobcat, regular } =
-    body;
+
+  const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment, checkoutType, bobcat, regular } = body;
   const fulfillment: "pickup" | "delivery" = rawFulfillment === "pickup" ? "pickup" : "delivery";
 
-  const cookies = parseCookieHeader(req.headers?.cookie);
-  let rawOk: string | undefined;
-  try {
-    rawOk = cookies[CH_OK] ? decodeURIComponent(cookies[CH_OK]) : undefined;
-  } catch {
-    rawOk = cookies[CH_OK];
-  }
-  const ok: OkPayload | null = verifyOkCookie(rawOk);
+  const ok: OkPayload | null = verifyOkCookie(getCookieValue(request, CH_OK));
   if (!ok) {
-    res.status(401).json({ error: "Complete email verification first (request a code, then enter it)" });
-    return;
+    return jsonResponse({ error: "Complete email verification first (request a code, then enter it)" }, 401);
   }
   if (checkoutType !== "bobcat" && checkoutType !== "regular") {
-    res.status(400).json({ error: "Missing checkout type" });
-    return;
+    return jsonResponse({ error: "Missing checkout type" }, 400);
   }
   if (ok.f !== checkoutType) {
-    res.status(400).json({ error: "Checkout type does not match verified code" });
-    return;
+    return jsonResponse({ error: "Checkout type does not match verified code" }, 400);
   }
   if (checkoutType === "bobcat") {
     if (!bobcat?.name?.trim() || !bobcat?.grade?.trim() || !bobcat?.bobcatEmail?.trim()) {
-      res.status(400).json({ error: "Bobcat: name, grade, and school email are required" });
-      return;
+      return jsonResponse({ error: "Bobcat: name, grade, and school email are required" }, 400);
     }
   } else {
     if (!regular?.name?.trim() || !regular?.email?.trim()) {
-      res.status(400).json({ error: "Regular pickup: name and email are required" });
-      return;
+      return jsonResponse({ error: "Regular pickup: name and email are required" }, 400);
     }
   }
   if (!baseUrl) {
-    res.status(400).json({ error: "Missing baseUrl" });
-    return;
+    return jsonResponse({ error: "Missing baseUrl" }, 400);
   }
 
   const origin = baseUrl.replace(/\/$/, "");
-
-  // Support either cart (items array) or single-item (productId)
-  const lineItemInputs: { productId: string; quantity: number }[] = Array.isArray(cartItems) && cartItems.length > 0
-    ? cartItems
-    : productId
-      ? [{ productId, quantity }]
-      : [];
+  const lineItemInputs: { productId: string; quantity: number }[] =
+    Array.isArray(cartItems) && cartItems.length > 0
+      ? cartItems
+      : productId
+        ? [{ productId, quantity }]
+        : [];
 
   if (lineItemInputs.length === 0) {
-    res.status(400).json({ error: "Missing items or productId" });
-    return;
+    return jsonResponse({ error: "Missing items or productId" }, 400);
   }
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   for (const { productId: id, quantity: qty } of lineItemInputs) {
     const product = getProduct(id);
     if (!product) {
-      res.status(404).json({ error: `Product not found: ${id}` });
-      return;
+      return jsonResponse({ error: `Product not found: ${id}` }, 404);
     }
     line_items.push({
       quantity: qty,
@@ -189,24 +171,14 @@ export default async function handler(
     }
 
     const session = await getStripe().checkout.sessions.create(sessionParams);
-    clearCookie(res, CH_OK);
-
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ url: session.url });
+    return jsonResponse({ url: session.url }, 200, [formatClearCookieHeader(CH_OK)]);
   } catch (e) {
     console.error("Stripe checkout error:", e);
-    res.status(500).json({ error: "Could not create checkout session" });
+    const msg = e instanceof Error ? e.message : "Could not create checkout session";
+    return jsonResponse({ error: msg }, 500);
   }
 }
 
-// Minimal server-side product lookup (mirrors your frontend products for the API)
-function getProduct(id: string): { title: string; description?: string; price: number; currency: string; image?: string } | null {
-  const products: Record<string, { title: string; description?: string; price: number; currency: string; image?: string }> = {
-    "1": { title: "3D printed egg fidget", description: "Satisfying 3D-printed egg fidget toy.", price: 10, currency: "usd", image: "/Photos/egg-fidget-2.jpg" },
-    "2": { title: "3D printed Samurai Sword", description: "Detailed 3D-printed samurai sword replica.", price: 20, currency: "usd", image: "/Photos/samurai-sword-2.jpg" },
-    "3": { title: "Articulated dragon", description: "Flexible articulated dragon figure.", price: 18, currency: "usd", image: "/Photos/articulated-dragon.jpg" },
-    "4": { title: "Shiny dragon", description: "Beautiful shiny dragon figure.", price: 28, currency: "usd", image: "/Photos/shiny-dragon.jpg" },
-    "5": { title: "Skull pass-through toy", description: "Unique 3D-printed skull with pass-through design.", price: 16, currency: "usd", image: "/Photos/skull-pass-through-2.jpg" },
-  };
-  return products[id] ?? null;
+export function GET(): Response {
+  return methodNotAllowed();
 }

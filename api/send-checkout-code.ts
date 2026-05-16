@@ -1,24 +1,19 @@
 import {
   CH_PENDING,
+  formatSetCookieHeader,
   generateSixDigitCode,
-  setCookie,
   signPending,
   type PendingPayload,
 } from "./checkout-cookies";
-import { readJsonBody, type ReqWithBody } from "./read-json-body";
+import { jsonResponse, methodNotAllowed } from "./http";
 
-declare const process: { env: Record<string, string | undefined> };
+export const runtime = "nodejs";
 
 type Body = { email?: string; flowType?: "bobcat" | "regular" };
 
-type Req = ReqWithBody & { method?: string; headers?: { cookie?: string } };
-type Res = { status: (n: number) => { json: (o: object) => void }; setHeader: (k: string, v: string | string[] | number) => void };
-
 async function sendResendEmail(to: string, subject: string, text: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY is not set");
-  }
+  if (!apiKey) throw new Error("RESEND_API_KEY is not set");
   const from = process.env.RESEND_FROM_EMAIL || "Prints for UNICEF <onboarding@resend.dev>";
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -31,22 +26,22 @@ async function sendResendEmail(to: string, subject: string, text: string): Promi
   }
 }
 
-export default async function handler(req: Req, res: Res) {
+export async function POST(request: Request): Promise<Response> {
   try {
-    if (req.method !== "POST") {
-      res.status(405).json({ error: "Method not allowed" });
-      return;
+    let body: Body;
+    try {
+      body = (await request.json()) as Body;
+    } catch {
+      return jsonResponse({ error: "Invalid JSON body" }, 400);
     }
 
-    const { email, flowType } = await readJsonBody<Body>(req);
-    const e = (email || "").trim().toLowerCase();
+    const e = (body.email || "").trim().toLowerCase();
+    const flowType = body.flowType;
     if (!e || !e.includes("@")) {
-      res.status(400).json({ error: "Valid email is required" });
-      return;
+      return jsonResponse({ error: "Valid email is required" }, 400);
     }
     if (flowType !== "bobcat" && flowType !== "regular") {
-      res.status(400).json({ error: "flowType must be bobcat or regular" });
-      return;
+      return jsonResponse({ error: "flowType must be bobcat or regular" }, 400);
     }
 
     const code = generateSixDigitCode();
@@ -57,10 +52,8 @@ export default async function handler(req: Req, res: Res) {
       token = signPending(payload);
     } catch (err) {
       console.error("send-checkout-code config error:", err);
-      res.status(500).json({ error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)" });
-      return;
+      return jsonResponse({ error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)" }, 500);
     }
-    setCookie(res, CH_PENDING, token, 15 * 60);
 
     const label = flowType === "bobcat" ? "Bobcat (school) checkout" : "Regular pickup";
     const text = [
@@ -74,17 +67,24 @@ export default async function handler(req: Req, res: Res) {
     } catch (err) {
       console.error("send-checkout-code Resend error:", err);
       const detail = err instanceof Error ? err.message : "unknown";
-      res.status(500).json({
-        error: detail.startsWith("Resend:") ? detail : "Could not send email. Check RESEND_API_KEY and domain setup.",
-      });
-      return;
+      return jsonResponse(
+        {
+          error: detail.startsWith("Resend:")
+            ? detail
+            : "Could not send email. Check RESEND_API_KEY and domain setup.",
+        },
+        500
+      );
     }
 
-    res.setHeader("Content-Type", "application/json");
-    res.status(200).json({ ok: true });
+    return jsonResponse({ ok: true }, 200, [formatSetCookieHeader(CH_PENDING, token, 15 * 60)]);
   } catch (err) {
     console.error("send-checkout-code unhandled:", err);
     const msg = err instanceof Error ? err.message : "Server error";
-    res.status(500).json({ error: msg });
+    return jsonResponse({ error: msg }, 500);
   }
+}
+
+export function GET(): Response {
+  return methodNotAllowed();
 }

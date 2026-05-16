@@ -1,6 +1,7 @@
 import Stripe from "stripe";
+import { jsonResponse, methodNotAllowed } from "./http";
 
-declare const process: { env: Record<string, string | undefined> };
+export const runtime = "nodejs";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -115,32 +116,6 @@ async function sendShopOwnerNewOrderEmail(params: {
   );
 }
 
-type ReqLike = {
-  method?: string;
-  headers: Record<string, string | string[] | undefined>;
-  on: (event: "data" | "end" | "error", cb: (chunk?: unknown) => void) => void;
-};
-
-type ResLike = {
-  status: (n: number) => { json: (o: object) => void };
-};
-
-function getHeaderValue(v: string | string[] | undefined): string | undefined {
-  if (!v) return undefined;
-  return Array.isArray(v) ? v[0] : v;
-}
-
-async function readRawBody(req: ReqLike): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  return await new Promise((resolve, reject) => {
-    req.on("data", (chunk) => {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
-    });
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
-  });
-}
-
 function formatAmount(amountTotal: number | null, currency: string | null): string {
   if (amountTotal == null || !currency) return "Unknown";
   return `${(amountTotal / 100).toFixed(2)} ${currency.toUpperCase()}`;
@@ -156,21 +131,15 @@ async function sendDiscordNotification(message: string): Promise<void> {
   });
 }
 
-export default async function handler(req: ReqLike, res: ResLike) {
-  if (req.method !== "POST") {
-    res.status(405).json({ error: "Method not allowed" });
-    return;
-  }
-
-  const signature = getHeaderValue(req.headers["stripe-signature"]);
+export async function POST(request: Request): Promise<Response> {
+  const signature = request.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!signature || !webhookSecret) {
-    res.status(400).json({ error: "Missing webhook signature or secret" });
-    return;
+    return jsonResponse({ error: "Missing webhook signature or secret" }, 400);
   }
 
   try {
-    const rawBody = await readRawBody(req);
+    const rawBody = Buffer.from(await request.arrayBuffer());
     const event = getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
 
     if (event.type === "checkout.session.completed") {
@@ -222,9 +191,13 @@ export default async function handler(req: ReqLike, res: ResLike) {
       await sendDiscordNotification(message);
     }
 
-    res.status(200).json({ received: true });
+    return jsonResponse({ received: true });
   } catch (err) {
     console.error("Stripe webhook error:", err);
-    res.status(400).json({ error: "Webhook error" });
+    return jsonResponse({ error: "Webhook error" }, 400);
   }
+}
+
+export function GET(): Response {
+  return methodNotAllowed();
 }
