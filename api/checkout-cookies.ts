@@ -1,4 +1,4 @@
-import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "crypto";
 
 export const CH_PENDING = "ch_p";
 export const CH_OK = "ch_ok";
@@ -30,9 +30,18 @@ function verifyData<T>(token: string | undefined): T | null {
   } catch {
     return null;
   }
-  const expected = createHmac("sha256", getSecret()).update(b).digest("base64url");
+  let expected: string;
+  try {
+    expected = createHmac("sha256", getSecret()).update(b).digest("base64url");
+  } catch {
+    return null;
+  }
   if (expected.length !== sig.length) return null;
-  if (!timingSafeEqual(Buffer.from(expected, "utf8"), Buffer.from(sig, "utf8"))) {
+  try {
+    if (!timingSafeEqual(Buffer.from(expected, "utf8"), Buffer.from(sig, "utf8"))) {
+      return null;
+    }
+  } catch {
     return null;
   }
   try {
@@ -62,6 +71,17 @@ export function verifyOkCookie(raw: string | undefined): OkPayload | null {
 
 export function generateSixDigitCode(): string {
   return String(randomInt(100000, 1000000));
+}
+
+export function safeCodeEqual(a: string, b: string): boolean {
+  const x = Buffer.from(a, "utf8");
+  const y = Buffer.from(b, "utf8");
+  if (x.length !== y.length) return false;
+  try {
+    return timingSafeEqual(x, y);
+  } catch {
+    return false;
+  }
 }
 
 export function parseCookieHeader(header: string | undefined): Record<string, string> {

@@ -1,13 +1,14 @@
 import Stripe from "stripe";
-import { CH_OK, clearCookie, parseCookieHeader, verifyOkCookie, type OkPayload } from "./lib/checkout-cookies";
+import { CH_OK, clearCookie, parseCookieHeader, verifyOkCookie, type OkPayload } from "./checkout-cookies";
+import { readJsonBody, type ReqWithBody } from "./read-json-body";
 
 declare const process: { env: Record<string, string | undefined> };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-export const config = {
-  api: { bodyParser: true },
-};
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key);
+}
 
 type Body = {
   baseUrl?: string;
@@ -24,9 +25,8 @@ type Body = {
   regular?: { name: string; email: string };
 };
 
-type HandlerReq = {
+type HandlerReq = ReqWithBody & {
   method?: string;
-  body?: Body;
   headers?: { cookie?: string };
 };
 
@@ -61,7 +61,13 @@ export default async function handler(
     return;
   }
 
-  const body = (req.body || {}) as Body;
+  let body: Body;
+  try {
+    body = await readJsonBody<Body>(req);
+  } catch {
+    res.status(400).json({ error: "Invalid JSON body" });
+    return;
+  }
   const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment, checkoutType, bobcat, regular } =
     body;
   const fulfillment: "pickup" | "delivery" = rawFulfillment === "pickup" ? "pickup" : "delivery";
@@ -182,7 +188,7 @@ export default async function handler(
       };
     }
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    const session = await getStripe().checkout.sessions.create(sessionParams);
     clearCookie(res, CH_OK);
 
     res.setHeader("Content-Type", "application/json");

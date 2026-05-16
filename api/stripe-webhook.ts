@@ -2,7 +2,11 @@ import Stripe from "stripe";
 
 declare const process: { env: Record<string, string | undefined> };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key);
+}
 
 /** 6-digit PIN for buyer verification (email + Stripe metadata). */
 function generateVerificationPin(): string {
@@ -19,6 +23,7 @@ function getPaymentIntentId(session: Stripe.Checkout.Session): string | null {
 }
 
 async function attachPinToPaymentIntent(paymentIntentId: string, pin: string): Promise<void> {
+  const stripe = getStripe();
   const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
   await stripe.paymentIntents.update(paymentIntentId, {
     metadata: {
@@ -110,10 +115,6 @@ async function sendShopOwnerNewOrderEmail(params: {
   );
 }
 
-export const config = {
-  api: { bodyParser: false },
-};
-
 type ReqLike = {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
@@ -170,7 +171,7 @@ export default async function handler(req: ReqLike, res: ResLike) {
 
   try {
     const rawBody = await readRawBody(req);
-    const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    const event = getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
