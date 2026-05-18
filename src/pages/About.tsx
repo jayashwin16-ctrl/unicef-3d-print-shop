@@ -41,6 +41,9 @@ export default function About() {
             We hope you enjoy our products and this website. Share feedback anytime, and tell others
             about 3D Prints for Good. Happy shopping!
           </p>
+          <p className="text-brand-muted">
+            This project was created by Jay.
+          </p>
         </div>
       </Section>
 

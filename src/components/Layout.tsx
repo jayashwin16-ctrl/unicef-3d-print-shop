@@ -93,6 +93,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <p className="text-xs text-brand-dim">
           3D Prints for Good — Student-led 3D print shop · Pledged giving aligned with UNICEF values
         </p>
+        <p className="mt-1 text-xs text-brand-dim">This project was created by Jay.</p>
         <p className="mt-2 text-xs text-brand-dim">
           <Link to="/about" className="underline hover:text-brand-heading">
             About & school pickup
