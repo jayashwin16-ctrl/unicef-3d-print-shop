@@ -3,36 +3,68 @@ import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
 
-const FACTS = [
+const REGION_FACTS = [
   {
-    number: "32M+",
-    text: "Children out of school in South Asia alone—before counting the rest of the world.",
-    source: "UNESCO / UNICEF estimates",
+    icon: "🌏",
+    region: "East Asia & Pacific",
+    number: "30+",
+    text: "Countries and territories where UNICEF runs health, nutrition, and education programs for children.",
+    source: "UNICEF East Asia & Pacific",
   },
   {
-    number: "50%+",
-    text: "Of children in low-income countries cannot read a simple story by age 10.",
-    source: "World Bank, learning poverty",
+    icon: "🌍",
+    region: "Eastern & Southern Africa",
+    number: "20+",
+    text: "Countries where UNICEF delivers vaccines, treats malnutrition, and keeps children learning through crises.",
+    source: "UNICEF Eastern & Southern Africa",
   },
   {
-    number: "1 in 5",
-    text: "Children worldwide live in conflict zones or fragile settings where school is disrupted.",
+    icon: "🏔️",
+    region: "Europe & Central Asia",
+    number: "20+",
+    text: "Countries where UNICEF supports refugee and migrant children, inclusive schools, and emergency relief.",
+    source: "UNICEF Europe & Central Asia",
+  },
+  {
+    icon: "🌎",
+    region: "Latin America & Caribbean",
+    number: "30+",
+    text: "Countries and territories where UNICEF works on early childhood, safe schools, and protection from violence.",
+    source: "UNICEF Latin America & Caribbean",
+  },
+  {
+    icon: "🕌",
+    region: "Middle East & North Africa",
+    number: "20+",
+    text: "Countries where UNICEF responds to conflict and displacement with water, health care, and psychosocial support.",
+    source: "UNICEF Middle East & North Africa",
+  },
+  {
+    icon: "🪷",
+    region: "South Asia",
+    number: "8",
+    text: "Countries in this region where UNICEF focuses on literacy, nutrition, and girls' education for hundreds of millions of children.",
+    source: "UNICEF South Asia",
+  },
+  {
+    icon: "🌍",
+    region: "West & Central Africa",
+    number: "24",
+    text: "Countries supported from UNICEF's regional hub in Dakar, with focus on vaccines, safe water, and ending child marriage.",
+    source: "UNICEF West & Central Africa",
+  },
+];
+
+const GLOBAL_FACTS = [
+  {
+    number: "190+",
+    text: "Countries and territories where UNICEF works—the widest reach of any organization focused only on children.",
     source: "UNICEF",
   },
   {
-    number: "2×",
-    text: "Girls in some regions are twice as likely as boys to never attend school.",
-    source: "UNICEF education reports",
-  },
-  {
-    number: "26M+",
-    text: "Child laborers in South Asia—the highest regional total globally.",
-    source: "ILO estimates",
-  },
-  {
-    number: "Your $",
-    text: "Every purchase from our shop pledges about 50% toward children-focused giving.",
-    source: "Prints for UNICEF shop policy",
+    number: "~50%",
+    text: "Of each sale from our shop pledged toward children-focused giving aligned with UNICEF's mission.",
+    source: "3D Prints for Good",
   },
 ];
 
@@ -46,17 +78,21 @@ export default function Stats() {
             Stats & <span className="text-brand-blue">Data</span>
           </>
         }
-        subtitle="Numbers help us understand the scale of the crisis—and why every action matters."
+        subtitle="UNICEF organizes much of its work through seven regional offices worldwide. Here is what children face in those focus areas."
       />
 
-      <Section title="Key facts">
+      <Section title="Facts by UNICEF focus region">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FACTS.map((f) => (
+          {REGION_FACTS.map((f) => (
             <div
-              key={f.number + f.text.slice(0, 20)}
+              key={f.region}
               className="rounded-[10px] border border-brand-border bg-brand-card p-6 text-center"
             >
-              <div className="text-[32px] font-bold text-brand-blue">{f.number}</div>
+              <div className="text-[28px]">{f.icon}</div>
+              <p className="mt-2 text-xs font-bold uppercase tracking-wide text-brand-blue-dark">
+                {f.region}
+              </p>
+              <div className="mt-3 text-[32px] font-bold text-brand-blue">{f.number}</div>
               <p className="mt-2 text-sm leading-relaxed text-[#333]">{f.text}</p>
               <p className="mt-2.5 text-[11px] text-brand-dim">{f.source}</p>
             </div>
@@ -76,11 +112,27 @@ export default function Stats() {
         </p>
       </Section>
 
-      <Section title="How our shop fits in" alt>
+      <Section title="Worldwide snapshot" alt>
+        <div className="mx-auto grid max-w-2xl gap-4 sm:grid-cols-2">
+          {GLOBAL_FACTS.map((f) => (
+            <div
+              key={f.number}
+              className="rounded-[10px] border border-brand-border bg-brand-card p-6 text-center"
+            >
+              <div className="text-[32px] font-bold text-brand-blue">{f.number}</div>
+              <p className="mt-2 text-sm leading-relaxed text-[#333]">{f.text}</p>
+              <p className="mt-2.5 text-[11px] text-brand-dim">{f.source}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="How our shop fits in">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
             We are not a large charity—we are a 3D print shop with a pledge. Each product lists the
-            percentage of that sale we set aside for giving aligned with UNICEF&apos;s values.
+            percentage of that sale we set aside for giving aligned with UNICEF&apos;s values,
+            across all the regions where UNICEF works.
           </p>
           <p>
             Buying a $10 fidget can mean $5 pledged. Buying a $28 figure can mean $14 pledged. Small

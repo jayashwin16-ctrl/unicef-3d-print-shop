@@ -1,21 +1,47 @@
-import {
-  CH_PENDING,
-  formatSetCookieHeader,
-  generateSixDigitCode,
-  signPending,
-  type PendingPayload,
-} from "./checkout-cookies";
-import { jsonResponse, methodNotAllowed } from "./http";
-import { createPostHandler } from "./vercel-bridge";
+import { createHmac, randomInt } from "crypto";
 
-export const runtime = "nodejs";
+const CH_PENDING = "ch_p";
 
 type Body = { email?: string; flowType?: "bobcat" | "regular" };
+type PendingPayload = { c: string; e: string; f: "bobcat" | "regular"; exp: number; v: 1 };
+
+type Req = {
+  method?: string;
+  body?: Body;
+};
+
+type Res = {
+  status: (code: number) => { json: (body: object) => void };
+  setHeader: (name: string, value: string | string[] | number) => void;
+};
+
+function getSecret(): string {
+  const s = process.env.CHECKOUT_SESSION_SECRET;
+  if (!s || s.length < 16) {
+    throw new Error("Set CHECKOUT_SESSION_SECRET (at least 16 characters) in environment variables");
+  }
+  return s;
+}
+
+function signPending(p: PendingPayload): string {
+  const b = Buffer.from(JSON.stringify(p), "utf8");
+  const sig = createHmac("sha256", getSecret()).update(b).digest("base64url");
+  return `${b.toString("base64url")}.${sig}`;
+}
+
+function formatSetCookie(name: string, value: string, maxAge: number): string {
+  const secure = process.env.VERCEL || process.env.NODE_ENV === "production" ? "Secure; " : "";
+  return `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; HttpOnly; ${secure}SameSite=Lax`;
+}
+
+function generateSixDigitCode(): string {
+  return String(randomInt(100000, 1000000));
+}
 
 async function sendResendEmail(to: string, subject: string, text: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error("RESEND_API_KEY is not set");
-  const from = process.env.RESEND_FROM_EMAIL || "Prints for UNICEF <onboarding@resend.dev>";
+  const from = process.env.RESEND_FROM_EMAIL || "3D Prints for Good <onboarding@resend.dev>";
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -27,33 +53,44 @@ async function sendResendEmail(to: string, subject: string, text: string): Promi
   }
 }
 
-export async function POST(request: Request): Promise<Response> {
+export default async function handler(req: Req, res: Res): Promise<void> {
   try {
-    let body: Body;
-    try {
-      body = (await request.json()) as Body;
-    } catch {
-      return jsonResponse({ error: "Invalid JSON body" }, 400);
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
     }
 
+    const body = (req.body || {}) as Body;
     const e = (body.email || "").trim().toLowerCase();
     const flowType = body.flowType;
+
     if (!e || !e.includes("@")) {
-      return jsonResponse({ error: "Valid email is required" }, 400);
+      res.status(400).json({ error: "Valid email is required" });
+      return;
     }
     if (flowType !== "bobcat" && flowType !== "regular") {
-      return jsonResponse({ error: "flowType must be bobcat or regular" }, 400);
+      res.status(400).json({ error: "flowType must be bobcat or regular" });
+      return;
     }
 
     const code = generateSixDigitCode();
-    const exp = Date.now() + 15 * 60 * 1000;
-    const payload: PendingPayload = { c: code, e, f: flowType, exp, v: 1 };
+    const payload: PendingPayload = {
+      c: code,
+      e,
+      f: flowType,
+      exp: Date.now() + 15 * 60 * 1000,
+      v: 1,
+    };
+
     let token: string;
     try {
       token = signPending(payload);
     } catch (err) {
       console.error("send-checkout-code config error:", err);
-      return jsonResponse({ error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)" }, 500);
+      res.status(500).json({
+        error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)",
+      });
+      return;
     }
 
     const label = flowType === "bobcat" ? "Bobcat (school) checkout" : "Regular pickup";
@@ -68,26 +105,20 @@ export async function POST(request: Request): Promise<Response> {
     } catch (err) {
       console.error("send-checkout-code Resend error:", err);
       const detail = err instanceof Error ? err.message : "unknown";
-      return jsonResponse(
-        {
-          error: detail.startsWith("Resend:")
-            ? detail
-            : "Could not send email. Check RESEND_API_KEY and domain setup.",
-        },
-        500
-      );
+      res.status(500).json({
+        error: detail.startsWith("Resend:")
+          ? detail
+          : "Could not send email. Check RESEND_API_KEY and domain setup.",
+      });
+      return;
     }
 
-    return jsonResponse({ ok: true }, 200, [formatSetCookieHeader(CH_PENDING, token, 15 * 60)]);
+    res.setHeader("Set-Cookie", formatSetCookie(CH_PENDING, token, 15 * 60));
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json({ ok: true });
   } catch (err) {
     console.error("send-checkout-code unhandled:", err);
     const msg = err instanceof Error ? err.message : "Server error";
-    return jsonResponse({ error: msg }, 500);
+    res.status(500).json({ error: msg });
   }
 }
-
-export function GET(): Response {
-  return methodNotAllowed();
-}
-
-export default createPostHandler(POST);
