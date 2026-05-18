@@ -24,7 +24,7 @@ export default function Home() {
     <>
       <PageHero
         image
-        label="A student-led shop"
+        label="This project was created by Jay"
         title={
           <>
             Help Children Worldwide
@@ -65,8 +65,8 @@ export default function Home() {
           </div>
           <div className="flex-1 text-sm leading-relaxed text-[#333]">
             <p className="mb-3.5">
-              <strong className="text-brand-heading">Prints for UNICEF</strong> is a 3D print shop
-              run by students who want every child to have a fair chance. We make fidgets, figures,
+              <strong className="text-brand-heading">3D Prints for Good</strong> is a 3D print shop
+              created by Jay to help every child have a fair chance. We make fidgets, figures,
               and collectibles—and pledge a meaningful share of each sale to support children.
             </p>
             <p>
@@ -104,7 +104,7 @@ export default function Home() {
           &ldquo;I believe every child deserves safety, school, and a future. This shop is one way we
           can help—one print at a time.&rdquo;
         </blockquote>
-        <p className="mt-3 text-center text-sm text-brand-muted">— Prints for UNICEF team</p>
+        <p className="mt-3 text-center text-sm text-brand-muted">— Jay</p>
       </Section>
 
       <Section title="Featured prints" alt>
