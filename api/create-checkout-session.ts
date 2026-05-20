@@ -1,12 +1,71 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createHmac, timingSafeEqual } from "crypto";
 import Stripe from "stripe";
-import {
-  CH_OK,
-  formatClearCookieHeader,
-  getCookieValue,
-  verifyOkCookie,
-  type OkPayload,
-} from "./checkout-cookies";
+
+const CH_OK = "ch_ok";
+
+type OkPayload = { e: string; f: "bobcat" | "regular"; exp: number; v: 1 };
+
+function getCheckoutSecret(): string {
+  const s = process.env.CHECKOUT_SESSION_SECRET;
+  if (!s || s.length < 16) {
+    throw new Error("Set CHECKOUT_SESSION_SECRET (at least 16 characters) in environment variables");
+  }
+  return s;
+}
+
+function verifyOkCookie(raw: string | undefined): OkPayload | null {
+  if (!raw) return null;
+  const [payloadB64, sig] = raw.split(".");
+  if (!payloadB64 || !sig) return null;
+  let b: Buffer;
+  try {
+    b = Buffer.from(payloadB64, "base64url");
+  } catch {
+    return null;
+  }
+  let expected: string;
+  try {
+    expected = createHmac("sha256", getCheckoutSecret()).update(b).digest("base64url");
+  } catch {
+    return null;
+  }
+  if (expected.length !== sig.length) return null;
+  try {
+    if (!timingSafeEqual(Buffer.from(expected, "utf8"), Buffer.from(sig, "utf8"))) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+  try {
+    const o = JSON.parse(b.toString("utf8")) as OkPayload;
+    if (o.exp < Date.now()) return null;
+    return o;
+  } catch {
+    return null;
+  }
+}
+
+function getCookieValue(cookieHeader: string | undefined, name: string): string | undefined {
+  if (!cookieHeader) return undefined;
+  for (const part of cookieHeader.split(";")) {
+    const [k, ...rest] = part.split("=");
+    if (k?.trim() === name) {
+      const raw = rest.join("=").trim();
+      try {
+        return decodeURIComponent(raw);
+      } catch {
+        return raw;
+      }
+    }
+  }
+  return undefined;
+}
+
+function formatClearCookieHeader(name: string): string {
+  return `${name}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`;
+}
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;

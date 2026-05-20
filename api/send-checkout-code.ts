@@ -1,13 +1,33 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import {
-  CH_PENDING,
-  formatSetCookieHeader,
-  generateSixDigitCode,
-  signPending,
-  type PendingPayload,
-} from "./checkout-cookies";
+import { createHmac, randomInt } from "crypto";
+
+const CH_PENDING = "ch_p";
 
 type Body = { email?: string; flowType?: "bobcat" | "regular" };
+type PendingPayload = { c: string; e: string; f: "bobcat" | "regular"; exp: number; v: 1 };
+
+function getSecret(): string {
+  const s = process.env.CHECKOUT_SESSION_SECRET;
+  if (!s || s.length < 16) {
+    throw new Error("Set CHECKOUT_SESSION_SECRET (at least 16 characters) in environment variables");
+  }
+  return s;
+}
+
+function signPending(p: PendingPayload): string {
+  const b = Buffer.from(JSON.stringify(p), "utf8");
+  const sig = createHmac("sha256", getSecret()).update(b).digest("base64url");
+  return `${b.toString("base64url")}.${sig}`;
+}
+
+function formatSetCookie(name: string, value: string, maxAge: number): string {
+  const secure = process.env.VERCEL || process.env.NODE_ENV === "production" ? "Secure; " : "";
+  return `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; HttpOnly; ${secure}SameSite=Lax`;
+}
+
+function generateSixDigitCode(): string {
+  return String(randomInt(100000, 1000000));
+}
 
 async function sendResendEmail(to: string, subject: string, text: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -83,6 +103,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  res.setHeader("Set-Cookie", formatSetCookieHeader(CH_PENDING, token, 15 * 60));
+  res.setHeader("Set-Cookie", formatSetCookie(CH_PENDING, token, 15 * 60));
   res.status(200).json({ ok: true });
 }
