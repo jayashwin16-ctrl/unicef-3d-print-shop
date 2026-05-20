@@ -9,7 +9,7 @@ import {
   signOk,
   verifyPendingCookie,
   type OkPayload,
-} from "../lib/checkout-cookies";
+} from "./_lib/checkout-cookies";
 
 type Body = { code?: string };
 

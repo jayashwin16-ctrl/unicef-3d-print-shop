@@ -5,7 +5,7 @@ import {
   generateSixDigitCode,
   signPending,
   type PendingPayload,
-} from "../lib/checkout-cookies";
+} from "./_lib/checkout-cookies";
 
 type Body = { email?: string; flowType?: "bobcat" | "regular" };
 

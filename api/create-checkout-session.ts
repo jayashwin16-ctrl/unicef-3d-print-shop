@@ -6,7 +6,7 @@ import {
   getCookieValue,
   verifyOkCookie,
   type OkPayload,
-} from "../lib/checkout-cookies";
+} from "./_lib/checkout-cookies";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
