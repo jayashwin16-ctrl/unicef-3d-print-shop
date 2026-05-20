@@ -126,6 +126,9 @@ export default function Checkout() {
           if (res.status === 404) {
             msg =
               "API route not found. Run npm run dev (starts Vercel + API). UI-only: npm run dev:vite won't load /api.";
+          } else if (raw.includes("FUNCTION_INVOCATION_FAILED")) {
+            msg =
+              "Checkout API failed to start on the server. After the latest deploy, confirm CHECKOUT_SESSION_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL are set in Vercel → Settings → Environment Variables, then redeploy.";
           } else if (raw.trim()) {
             msg = raw.slice(0, 200);
           }
