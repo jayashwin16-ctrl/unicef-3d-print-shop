@@ -84,15 +84,20 @@ export function safeCodeEqual(a: string, b: string): boolean {
   }
 }
 
-export function parseCookieHeader(header: string | undefined): Record<string, string> {
-  if (!header) return {};
-  const m: Record<string, string> = {};
-  for (const part of header.split(";")) {
-    const [k, ...r] = part.split("=");
-    if (!k?.trim()) continue;
-    m[k.trim()] = r.join("=").trim();
+export function getCookieValue(cookieHeader: string | undefined, name: string): string | undefined {
+  if (!cookieHeader) return undefined;
+  for (const part of cookieHeader.split(";")) {
+    const [k, ...rest] = part.split("=");
+    if (k?.trim() === name) {
+      const raw = rest.join("=").trim();
+      try {
+        return decodeURIComponent(raw);
+      } catch {
+        return raw;
+      }
+    }
   }
-  return m;
+  return undefined;
 }
 
 function cookieBaseOpts(): { secure: string; same: string } {
@@ -107,20 +112,4 @@ export function formatSetCookieHeader(name: string, value: string, maxAge: numbe
 
 export function formatClearCookieHeader(name: string): string {
   return `${name}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`;
-}
-
-export function setCookie(
-  res: { setHeader: (k: string, v: string | string[] | number) => void },
-  name: string,
-  value: string,
-  maxAge: number
-): void {
-  res.setHeader("Set-Cookie", formatSetCookieHeader(name, value, maxAge));
-}
-
-export function clearCookie(
-  res: { setHeader: (k: string, v: string | string[] | number) => void },
-  name: string
-): void {
-  res.setHeader("Set-Cookie", formatClearCookieHeader(name));
 }

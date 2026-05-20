@@ -1,39 +1,40 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   CH_OK,
   CH_PENDING,
   formatClearCookieHeader,
   formatSetCookieHeader,
+  getCookieValue,
   safeCodeEqual,
   signOk,
   verifyPendingCookie,
   type OkPayload,
-} from "./checkout-cookies";
-import { getCookieValue, jsonResponse } from "./http";
-import { createPostHandler } from "./vercel-bridge";
-
-export const runtime = "nodejs";
+} from "../lib/checkout-cookies";
 
 type Body = { code?: string };
 
-export async function POST(request: Request): Promise<Response> {
-  let body: Body;
-  try {
-    body = (await request.json()) as Body;
-  } catch {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
   }
 
+  const body = (req.body || {}) as Body;
   const code = (body.code || "").trim();
   if (!/^\d{6}$/.test(code)) {
-    return jsonResponse({ error: "Enter the 6-digit code from your email" }, 400);
+    res.status(400).json({ error: "Enter the 6-digit code from your email" });
+    return;
   }
 
-  const pending = verifyPendingCookie(getCookieValue(request, CH_PENDING));
+  const cookieHeader = typeof req.headers.cookie === "string" ? req.headers.cookie : undefined;
+  const pending = verifyPendingCookie(getCookieValue(cookieHeader, CH_PENDING));
   if (!pending) {
-    return jsonResponse({ error: "Code expired or step missing. Request a new code." }, 400);
+    res.status(400).json({ error: "Code expired or step missing. Request a new code." });
+    return;
   }
   if (!safeCodeEqual(pending.c, code)) {
-    return jsonResponse({ error: "Incorrect code" }, 400);
+    res.status(400).json({ error: "Incorrect code" });
+    return;
   }
 
   const exp = Date.now() + 60 * 60 * 1000;
@@ -44,13 +45,13 @@ export async function POST(request: Request): Promise<Response> {
     token = signOk(ok);
   } catch (err) {
     console.error("verify-checkout-code config error:", err);
-    return jsonResponse({ error: "Server is not configured (CHECKOUT_SESSION_SECRET)" }, 500);
+    res.status(500).json({ error: "Server is not configured (CHECKOUT_SESSION_SECRET)" });
+    return;
   }
 
-  return jsonResponse({ ok: true, flowType: pending.f }, 200, [
+  res.setHeader("Set-Cookie", [
     formatClearCookieHeader(CH_PENDING),
     formatSetCookieHeader(CH_OK, token, 60 * 60),
   ]);
+  res.status(200).json({ ok: true, flowType: pending.f });
 }
-
-export default createPostHandler(POST);

@@ -1,8 +1,9 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import Stripe from "stripe";
-import { jsonResponse, methodNotAllowed } from "./http";
-import { createPostHandler } from "./vercel-bridge";
 
-export const runtime = "nodejs";
+export const config = {
+  api: { bodyParser: false },
+};
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -10,7 +11,17 @@ function getStripe(): Stripe {
   return new Stripe(key);
 }
 
-/** 6-digit PIN for buyer verification (email + Stripe metadata). */
+function readRawBody(req: VercelRequest): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on("data", (chunk) => {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+}
+
 function generateVerificationPin(): string {
   const buf = new Uint32Array(1);
   crypto.getRandomValues(buf);
@@ -28,25 +39,17 @@ async function attachPinToPaymentIntent(paymentIntentId: string, pin: string): P
   const stripe = getStripe();
   const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
   await stripe.paymentIntents.update(paymentIntentId, {
-    metadata: {
-      ...pi.metadata,
-      verification_pin: pin,
-    },
+    metadata: { ...pi.metadata, verification_pin: pin },
   });
 }
 
 async function sendResendEmail(to: string[], subject: string, text: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY not configured");
-  }
-  const from = process.env.RESEND_FROM_EMAIL || "Prints for UNICEF <onboarding@resend.dev>";
+  if (!apiKey) throw new Error("RESEND_API_KEY not configured");
+  const from = process.env.RESEND_FROM_EMAIL || "Prints for Good <onboarding@resend.dev>";
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from, to, subject, text }),
   });
   if (!res.ok) {
@@ -132,15 +135,21 @@ async function sendDiscordNotification(message: string): Promise<void> {
   });
 }
 
-export async function POST(request: Request): Promise<Response> {
-  const signature = request.headers.get("stripe-signature");
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
+  }
+
+  const signature = req.headers["stripe-signature"];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!signature || !webhookSecret) {
-    return jsonResponse({ error: "Missing webhook signature or secret" }, 400);
+  if (!signature || typeof signature !== "string" || !webhookSecret) {
+    res.status(400).json({ error: "Missing webhook signature or secret" });
+    return;
   }
 
   try {
-    const rawBody = Buffer.from(await request.arrayBuffer());
+    const rawBody = await readRawBody(req);
     const event = getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
 
     if (event.type === "checkout.session.completed") {
@@ -169,9 +178,7 @@ export async function POST(request: Request): Promise<Response> {
       const ownerNotify = process.env.ORDER_NOTIFY_EMAIL?.trim();
       if (ownerNotify && ownerNotify.includes("@")) {
         try {
-          const orderMeta = orderMetaLines(
-            session.metadata as Record<string, string> | undefined
-          );
+          const orderMeta = orderMetaLines(session.metadata as Record<string, string> | undefined);
           await sendShopOwnerNewOrderEmail({
             ownerEmail: ownerNotify,
             buyerEmail: buyerEmail && buyerEmail.includes("@") ? buyerEmail : "(not provided)",
@@ -192,15 +199,9 @@ export async function POST(request: Request): Promise<Response> {
       await sendDiscordNotification(message);
     }
 
-    return jsonResponse({ received: true });
+    res.status(200).json({ received: true });
   } catch (err) {
     console.error("Stripe webhook error:", err);
-    return jsonResponse({ error: "Webhook error" }, 400);
+    res.status(400).json({ error: "Webhook error" });
   }
 }
-
-export function GET(): Response {
-  return methodNotAllowed();
-}
-
-export default createPostHandler(POST);

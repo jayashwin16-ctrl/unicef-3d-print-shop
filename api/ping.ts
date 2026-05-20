@@ -1,10 +1,5 @@
-import { jsonResponse } from "./http";
-import { createGetHandler } from "./vercel-bridge";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export const runtime = "nodejs";
-
-export function GET(): Response {
-  return jsonResponse({ ok: true, service: "api" });
+export default function handler(_req: VercelRequest, res: VercelResponse) {
+  res.status(200).json({ ok: true, service: "api" });
 }
-
-export default createGetHandler(GET);

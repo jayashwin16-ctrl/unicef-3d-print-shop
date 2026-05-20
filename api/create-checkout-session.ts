@@ -1,14 +1,12 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import Stripe from "stripe";
 import {
   CH_OK,
   formatClearCookieHeader,
+  getCookieValue,
   verifyOkCookie,
   type OkPayload,
-} from "./checkout-cookies";
-import { getCookieValue, jsonResponse, methodNotAllowed } from "./http";
-import { createPostHandler } from "./vercel-bridge";
-
-export const runtime = "nodejs";
+} from "../lib/checkout-cookies";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -60,38 +58,44 @@ function getProduct(id: string): { title: string; description?: string; price: n
   return products[id] ?? null;
 }
 
-export async function POST(request: Request): Promise<Response> {
-  let body: Body;
-  try {
-    body = (await request.json()) as Body;
-  } catch {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
   }
 
+  const body = (req.body || {}) as Body;
   const { baseUrl, productId, quantity = 1, items: cartItems, fulfillment: rawFulfillment, checkoutType, bobcat, regular } = body;
   const fulfillment: "pickup" | "delivery" = rawFulfillment === "pickup" ? "pickup" : "delivery";
 
-  const ok: OkPayload | null = verifyOkCookie(getCookieValue(request, CH_OK));
+  const cookieHeader = typeof req.headers.cookie === "string" ? req.headers.cookie : undefined;
+  const ok: OkPayload | null = verifyOkCookie(getCookieValue(cookieHeader, CH_OK));
   if (!ok) {
-    return jsonResponse({ error: "Complete email verification first (request a code, then enter it)" }, 401);
+    res.status(401).json({ error: "Complete email verification first (request a code, then enter it)" });
+    return;
   }
   if (checkoutType !== "bobcat" && checkoutType !== "regular") {
-    return jsonResponse({ error: "Missing checkout type" }, 400);
+    res.status(400).json({ error: "Missing checkout type" });
+    return;
   }
   if (ok.f !== checkoutType) {
-    return jsonResponse({ error: "Checkout type does not match verified code" }, 400);
+    res.status(400).json({ error: "Checkout type does not match verified code" });
+    return;
   }
   if (checkoutType === "bobcat") {
     if (!bobcat?.name?.trim() || !bobcat?.grade?.trim() || !bobcat?.bobcatEmail?.trim()) {
-      return jsonResponse({ error: "Bobcat: name, grade, and school email are required" }, 400);
+      res.status(400).json({ error: "Bobcat: name, grade, and school email are required" });
+      return;
     }
   } else {
     if (!regular?.name?.trim() || !regular?.email?.trim()) {
-      return jsonResponse({ error: "Regular pickup: name and email are required" }, 400);
+      res.status(400).json({ error: "Regular pickup: name and email are required" });
+      return;
     }
   }
   if (!baseUrl) {
-    return jsonResponse({ error: "Missing baseUrl" }, 400);
+    res.status(400).json({ error: "Missing baseUrl" });
+    return;
   }
 
   const origin = baseUrl.replace(/\/$/, "");
@@ -103,14 +107,16 @@ export async function POST(request: Request): Promise<Response> {
         : [];
 
   if (lineItemInputs.length === 0) {
-    return jsonResponse({ error: "Missing items or productId" }, 400);
+    res.status(400).json({ error: "Missing items or productId" });
+    return;
   }
 
   const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
   for (const { productId: id, quantity: qty } of lineItemInputs) {
     const product = getProduct(id);
     if (!product) {
-      return jsonResponse({ error: `Product not found: ${id}` }, 404);
+      res.status(404).json({ error: `Product not found: ${id}` });
+      return;
     }
     line_items.push({
       quantity: qty,
@@ -172,16 +178,11 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const session = await getStripe().checkout.sessions.create(sessionParams);
-    return jsonResponse({ url: session.url }, 200, [formatClearCookieHeader(CH_OK)]);
+    res.setHeader("Set-Cookie", formatClearCookieHeader(CH_OK));
+    res.status(200).json({ url: session.url });
   } catch (e) {
     console.error("Stripe checkout error:", e);
     const msg = e instanceof Error ? e.message : "Could not create checkout session";
-    return jsonResponse({ error: msg }, 500);
+    res.status(500).json({ error: msg });
   }
 }
-
-export function GET(): Response {
-  return methodNotAllowed();
-}
-
-export default createPostHandler(POST);

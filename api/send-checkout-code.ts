@@ -1,14 +1,11 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   CH_PENDING,
   formatSetCookieHeader,
   generateSixDigitCode,
   signPending,
   type PendingPayload,
-} from "./checkout-cookies";
-import { jsonResponse } from "./http";
-import { createPostHandler } from "./vercel-bridge";
-
-export const runtime = "nodejs";
+} from "../lib/checkout-cookies";
 
 type Body = { email?: string; flowType?: "bobcat" | "regular" };
 
@@ -27,22 +24,23 @@ async function sendResendEmail(to: string, subject: string, text: string): Promi
   }
 }
 
-export async function POST(request: Request): Promise<Response> {
-  let body: Body;
-  try {
-    body = (await request.json()) as Body;
-  } catch {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
   }
 
+  const body = (req.body || {}) as Body;
   const e = (body.email || "").trim().toLowerCase();
   const flowType = body.flowType;
 
   if (!e || !e.includes("@")) {
-    return jsonResponse({ error: "Valid email is required" }, 400);
+    res.status(400).json({ error: "Valid email is required" });
+    return;
   }
   if (flowType !== "bobcat" && flowType !== "regular") {
-    return jsonResponse({ error: "flowType must be bobcat or regular" }, 400);
+    res.status(400).json({ error: "flowType must be bobcat or regular" });
+    return;
   }
 
   const code = generateSixDigitCode();
@@ -59,10 +57,10 @@ export async function POST(request: Request): Promise<Response> {
     token = signPending(payload);
   } catch (err) {
     console.error("send-checkout-code config error:", err);
-    return jsonResponse(
-      { error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)" },
-      500
-    );
+    res.status(500).json({
+      error: "Server is not configured for checkout codes (CHECKOUT_SESSION_SECRET)",
+    });
+    return;
   }
 
   const label = flowType === "bobcat" ? "Bobcat (school) checkout" : "Regular pickup";
@@ -77,17 +75,14 @@ export async function POST(request: Request): Promise<Response> {
   } catch (err) {
     console.error("send-checkout-code Resend error:", err);
     const detail = err instanceof Error ? err.message : "unknown";
-    return jsonResponse(
-      {
-        error: detail.startsWith("Resend:")
-          ? detail
-          : "Could not send email. Check RESEND_API_KEY and domain setup.",
-      },
-      500
-    );
+    res.status(500).json({
+      error: detail.startsWith("Resend:")
+        ? detail
+        : "Could not send email. Check RESEND_API_KEY and domain setup.",
+    });
+    return;
   }
 
-  return jsonResponse({ ok: true }, 200, [formatSetCookieHeader(CH_PENDING, token, 15 * 60)]);
+  res.setHeader("Set-Cookie", formatSetCookieHeader(CH_PENDING, token, 15 * 60));
+  res.status(200).json({ ok: true });
 }
-
-export default createPostHandler(POST);
