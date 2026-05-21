@@ -41,7 +41,7 @@ export default function SchoolPickupForm({
     >
       <h2 className="text-xl font-bold text-sky-900 md:text-2xl">School pickup</h2>
       <p className="mt-2 text-sm text-sky-800">
-        Full name, grade, and parent email (used for your receipt and school pickup).
+        Full name, grade, and email (used for your receipt and school pickup).
       </p>
       {pickupSubmitted ? (
         <p className="mt-4 rounded-lg bg-sky-200 px-3 py-2 text-sm font-medium text-sky-900">
@@ -77,7 +77,7 @@ export default function SchoolPickupForm({
           </div>
           <div>
             <label htmlFor={`pickupEmail${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
-              Parent email
+              Email (for receipt)
             </label>
             <input
               id={`pickupEmail${suf}`}
