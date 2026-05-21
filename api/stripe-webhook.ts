@@ -58,24 +58,91 @@ async function sendResendEmail(to: string[], subject: string, text: string): Pro
   }
 }
 
-async function sendPurchasePinEmail(to: string, pin: string, sessionId: string): Promise<void> {
+function siteOriginFromSession(session: Stripe.Checkout.Session): string {
+  const url = session.success_url;
+  if (!url) return process.env.SITE_URL?.replace(/\/$/, "") || "https://3dprintsforgood.com";
+  try {
+    return new URL(url).origin;
+  } catch {
+    return process.env.SITE_URL?.replace(/\/$/, "") || "https://3dprintsforgood.com";
+  }
+}
+
+function studentFromMeta(meta: Record<string, string> | undefined): { name?: string; grade?: string } {
+  if (!meta) return {};
+  if (meta.bobcat_name) {
+    return { name: meta.bobcat_name, grade: meta.bobcat_grade };
+  }
+  if (meta.regular_name) {
+    return { name: meta.regular_name };
+  }
+  return {};
+}
+
+async function sendThankYouEmail(params: {
+  to: string;
+  amount: string;
+  sessionId: string;
+  pin: string;
+  meta?: Record<string, string>;
+  session: Stripe.Checkout.Session;
+}): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
-    console.warn("[stripe-webhook] RESEND_API_KEY not set; skipping buyer PIN email");
+    console.warn("[stripe-webhook] RESEND_API_KEY not set; skipping thank-you email");
     return;
   }
-  await sendResendEmail(
-    [to],
-    "Your order verification PIN",
-    [
-      "Thanks for your purchase!",
-      "",
-      `Your verification PIN is: ${pin}`,
-      "",
-      "Keep this email. The shop may ask for this PIN to confirm you are the buyer (for example for pickup).",
-      "",
-      `Order reference: ${sessionId}`,
-    ].join("\n")
+
+  const { to, amount, sessionId, pin, meta, session } = params;
+  const origin = siteOriginFromSession(session);
+  const student = studentFromMeta(meta);
+  const fulfillment = meta?.fulfillment === "delivery" ? "delivery" : "pickup";
+
+  const lines = [
+    "Thank you for your order from 3D Prints for Good!",
+    "",
+    "Your payment was successful. We appreciate your support — part of each sale goes toward",
+    "children-focused giving aligned with UNICEF's mission.",
+    "",
+    `Amount paid: ${amount}`,
+    `Order reference: ${sessionId}`,
+  ];
+
+  if (student.name) {
+    lines.push(`Student: ${student.name}`);
+    if (student.grade) {
+      lines.push(`Grade: ${student.grade}`);
+    }
+  }
+
+  lines.push(
+    "",
+    `Your order verification PIN: ${pin}`,
+    "Please save this PIN. We may ask for it at school pickup to confirm your order.",
+    ""
   );
+
+  if (fulfillment === "pickup") {
+    lines.push(
+      "School pickup: If you have not already, fill out the school pickup form on our site:",
+      `${origin}/about#school-pickup`,
+      ""
+    );
+  } else {
+    lines.push(
+      "Your shipping details were collected during checkout. We will follow up if we need anything else.",
+      ""
+    );
+  }
+
+  lines.push(
+    "Questions? Reply to this email or visit our shop:",
+    `${origin}/shop`,
+    "",
+    "Thank you again for supporting 3D Prints for Good!",
+    "— 3D Prints for Good"
+  );
+
+  await sendResendEmail([to], "Thank you for your order — 3D Prints for Good", lines.join("\n"));
 }
 
 function orderMetaLines(m: Record<string, string> | null | undefined): string {
@@ -165,27 +232,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.warn("[stripe-webhook] No payment_intent on session; PIN not stored in Stripe metadata");
       }
 
+      const orderMeta = session.metadata as Record<string, string> | undefined;
+
       if (buyerEmail && buyerEmail.includes("@")) {
         try {
-          await sendPurchasePinEmail(buyerEmail, pin, session.id);
+          await sendThankYouEmail({
+            to: buyerEmail,
+            amount,
+            sessionId: session.id,
+            pin,
+            meta: orderMeta,
+            session,
+          });
         } catch (e) {
-          console.error("[stripe-webhook] Failed to send PIN email:", e);
+          console.error("[stripe-webhook] Failed to send thank-you email:", e);
         }
       } else {
-        console.warn("[stripe-webhook] No buyer email on session; PIN email not sent");
+        console.warn("[stripe-webhook] No buyer email on session; thank-you email not sent");
       }
 
       const ownerNotify = process.env.ORDER_NOTIFY_EMAIL?.trim();
       if (ownerNotify && ownerNotify.includes("@")) {
         try {
-          const orderMeta = orderMetaLines(session.metadata as Record<string, string> | undefined);
           await sendShopOwnerNewOrderEmail({
             ownerEmail: ownerNotify,
             buyerEmail: buyerEmail && buyerEmail.includes("@") ? buyerEmail : "(not provided)",
             amount,
             sessionId: session.id,
             pin,
-            orderMeta,
+            orderMeta: orderMetaLines(orderMeta),
           });
         } catch (e) {
           console.error("[stripe-webhook] Failed to send shop owner email:", e);
