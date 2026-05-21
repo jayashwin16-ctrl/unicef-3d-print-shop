@@ -130,7 +130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const cookieHeader = typeof req.headers.cookie === "string" ? req.headers.cookie : undefined;
   const ok: OkPayload | null = verifyOkCookie(getCookieValue(cookieHeader, CH_OK));
   if (!ok) {
-    res.status(401).json({ error: "Complete email verification first (request a code, then enter it)" });
+    res.status(401).json({ error: "Enter the correct checkout code before paying" });
     return;
   }
   if (checkoutType !== "bobcat" && checkoutType !== "regular") {
@@ -191,12 +191,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  const buyerEmail =
+    checkoutType === "bobcat"
+      ? bobcat!.bobcatEmail.trim().toLowerCase()
+      : regular!.email.trim().toLowerCase();
+
+  if (!buyerEmail.includes("@")) {
+    res.status(400).json({ error: "A valid buyer email is required" });
+    return;
+  }
+
   try {
     const shippingOptions = getShippingOptions();
     const pickupFormCartUrl = `${origin}/cart#school-pickup-cart`;
 
     const meta: NonNullable<Stripe.Checkout.SessionCreateParams["metadata"]> = {
-      code_verified_email: truncate(ok.e, 500),
+      code_verified: "true",
+      buyer_email: truncate(buyerEmail, 500),
       checkout_type: checkoutType,
       fulfillment,
     };
@@ -216,7 +227,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       phone_number_collection: { enabled: true },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
-      customer_email: ok.e,
+      customer_email: buyerEmail,
       metadata: meta,
     };
 

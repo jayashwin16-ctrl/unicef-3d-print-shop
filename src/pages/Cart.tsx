@@ -158,8 +158,8 @@ export default function Cart() {
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <p className="font-semibold text-slate-900">How do you want your order?</p>
             <p className="mt-2 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
-              Checkout requires a <strong>6-digit verification code</strong> sent to your email. You
-              cannot pay without entering it.
+              Checkout requires a <strong>5-digit code</strong> from the shop. You cannot pay without
+              it.
             </p>
             <ul className="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
               <li>

@@ -25,7 +25,7 @@ function saveStoredState(s: CheckoutLocationState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-type Step = "flow" | "email" | "code" | "fulfillment" | "form" | "pay";
+type Step = "flow" | "code" | "fulfillment" | "form" | "pay";
 type FlowType = "bobcat" | "regular" | null;
 
 const POST_VERIFY_STEPS: Step[] = ["fulfillment", "form", "pay"];
@@ -43,11 +43,9 @@ export default function Checkout() {
   const [verified, setVerified] = useState(false);
   const [statusLoading, setStatusLoading] = useState(true);
   const [flowType, setFlowType] = useState<FlowType>(null);
-  const [emailForCode, setEmailForCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [bobcat, setBobcat] = useState({ name: "", grade: "", bobcatEmail: "" });
   const [regular, setRegular] = useState({ name: "", email: "" });
-  const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [paying, setPaying] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -81,7 +79,6 @@ export default function Checkout() {
       if (status.verified) {
         setVerified(true);
         if (status.flowType) setFlowType(status.flowType);
-        if (status.email) setEmailForCode(status.email);
       }
       setStatusLoading(false);
     })();
@@ -97,15 +94,13 @@ export default function Checkout() {
     return null;
   }, [isCart, source, localFulfillment]);
 
-  const canShowTypeButtons = (isCart && !!source?.fulfillment) || (source?.buyNow && effectiveFulfillment !== null);
-
   function stepAfterVerification() {
     if (!source) return;
     if (source.buyNow && !source.fromCart && !effectiveFulfillment) {
       setStep("fulfillment");
       return;
     }
-    if (canShowTypeButtons || flowType) {
+    if (flowType) {
       setStep("form");
       return;
     }
@@ -115,13 +110,13 @@ export default function Checkout() {
   useEffect(() => {
     if (statusLoading) return;
     if (verified) {
-      if (step === "flow" || step === "email" || step === "code") {
+      if (step === "flow" || step === "code") {
         stepAfterVerification();
       }
       return;
     }
     if (POST_VERIFY_STEPS.includes(step) || step === "pay") {
-      setStep(flowType ? "email" : "flow");
+      setStep(flowType ? "code" : "flow");
     }
   }, [verified, statusLoading]);
 
@@ -132,8 +127,8 @@ export default function Checkout() {
   function goFulfillment(ful: "pickup" | "delivery") {
     if (!source) return;
     if (!verified) {
-      setErr("Enter the email verification code before continuing.");
-      setStep(flowType ? "email" : "flow");
+      setErr("Enter the checkout code before continuing.");
+      setStep(flowType ? "code" : "flow");
       return;
     }
     setLocalFulfillment(ful);
@@ -148,48 +143,11 @@ export default function Checkout() {
     setErr(null);
   }
 
-  async function sendCode() {
+  async function verifyCode() {
     if (!flowType) {
       setErr("Choose Bobcat or Regular first.");
       return;
     }
-    setErr(null);
-    setSending(true);
-    try {
-      const res = await fetch("/api/send-checkout-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email: emailForCode, flowType }),
-      });
-      if (!res.ok) {
-        const raw = await res.text();
-        let msg = "Could not send code";
-        try {
-          const d = JSON.parse(raw) as { error?: string };
-          if (d.error) msg = d.error;
-        } catch {
-          if (res.status === 404) {
-            msg =
-              "API route not found. Run npm run dev (starts Vercel + API). UI-only: npm run dev:vite won't load /api.";
-          } else if (raw.includes("FUNCTION_INVOCATION_FAILED")) {
-            msg =
-              "Checkout API failed to start on the server. Confirm CHECKOUT_SESSION_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL on Vercel, then redeploy.";
-          } else if (raw.trim()) {
-            msg = raw.slice(0, 200);
-          }
-        }
-        throw new Error(msg);
-      }
-      setStep("code");
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "Error");
-    } finally {
-      setSending(false);
-    }
-  }
-
-  async function verifyCode() {
     setErr(null);
     setVerifying(true);
     try {
@@ -197,7 +155,7 @@ export default function Checkout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ code: codeInput.trim() }),
+        body: JSON.stringify({ code: codeInput.trim(), flowType }),
       });
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
@@ -215,7 +173,7 @@ export default function Checkout() {
   async function goPay() {
     if (!source) return;
     if (!verified) {
-      setErr("You must verify the 6-digit email code before paying.");
+      setErr("You must enter the correct checkout code before paying.");
       setStep("code");
       return;
     }
@@ -272,7 +230,7 @@ export default function Checkout() {
       throw new Error("No checkout URL");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
-      if (msg.includes("verification") || msg.includes("code")) {
+      if (msg.includes("code") || msg.includes("verification")) {
         setVerified(false);
         setStep("code");
         setErr(msg);
@@ -286,7 +244,7 @@ export default function Checkout() {
 
   function goToPayStep() {
     if (!verified) {
-      setErr("Verify the 6-digit code from your email before payment.");
+      setErr("Enter the checkout code before payment.");
       setStep("code");
       return;
     }
@@ -305,16 +263,15 @@ export default function Checkout() {
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
       <p className="text-sm text-slate-600 mb-4">
-        Purchases are only allowed after you verify the one-time code we email you. Payment will not
-        work without it.
+        Enter the 5-digit checkout code you were given to unlock payment. No email is sent.
       </p>
       {verified ? (
         <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
-          Email verified — you can complete your order.
+          Code accepted — you can complete your order.
         </p>
       ) : (
         <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
-          Step 1: Get and enter your 6-digit code before you can pay.
+          Step 1: Enter the 5-digit code before you can pay.
         </p>
       )}
       {err && (
@@ -330,7 +287,7 @@ export default function Checkout() {
             type="button"
             onClick={() => {
               setFlowType("bobcat");
-              setStep("email");
+              setStep("code");
               setErr(null);
             }}
             className="w-full rounded-xl border-2 border-[#1CABE2] bg-sky-50 p-4 text-left font-semibold text-slate-900 hover:bg-sky-100"
@@ -341,7 +298,7 @@ export default function Checkout() {
             type="button"
             onClick={() => {
               setFlowType("regular");
-              setStep("email");
+              setStep("code");
               setErr(null);
             }}
             className="w-full rounded-xl border-2 border-slate-200 bg-white p-4 text-left font-semibold text-slate-900 hover:bg-slate-50"
@@ -351,55 +308,34 @@ export default function Checkout() {
         </div>
       )}
 
-      {step === "email" && flowType && !verified && (
-        <div className="space-y-4">
-          <p className="text-sm text-slate-600">
-            Enter the buyer email. We will send a one-time 6-digit code. You must enter that code to
-            unlock payment.
-          </p>
-          <div>
-            <label htmlFor="cemail" className="mb-1 block text-sm font-medium text-slate-700">
-              Buyer email
-            </label>
-            <input
-              id="cemail"
-              type="email"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={emailForCode}
-              onChange={(e) => setEmailForCode(e.target.value)}
-              required
-            />
-          </div>
-          <button
-            type="button"
-            disabled={sending}
-            onClick={sendCode}
-            className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white disabled:opacity-50"
-          >
-            {sending ? "Sending…" : "Send me the code"}
-          </button>
-        </div>
-      )}
-
       {step === "code" && flowType && !verified && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-600">Enter the 6-digit code we emailed you.</p>
+          <p className="text-sm text-slate-600">
+            Enter the 5-digit checkout code (ask the shop if you do not have it).
+          </p>
           <input
             type="text"
             inputMode="numeric"
-            maxLength={6}
+            maxLength={5}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-lg tracking-widest"
             value={codeInput}
-            onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            placeholder="000000"
+            onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, "").slice(0, 5))}
+            placeholder="00000"
           />
           <button
             type="button"
-            disabled={verifying || codeInput.length !== 6}
+            disabled={verifying || codeInput.length !== 5}
             onClick={verifyCode}
             className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white disabled:opacity-50"
           >
-            {verifying ? "Verifying…" : "Verify code to continue"}
+            {verifying ? "Checking…" : "Verify code to continue"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setStep("flow")}
+            className="text-sm text-brand-blue hover:underline"
+          >
+            ← Change checkout type
           </button>
         </div>
       )}

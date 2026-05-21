@@ -123,8 +123,8 @@ export default function ProductDetail() {
             </p>
           )}
           <p className="mt-4 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
-            To buy, you must verify a <strong>6-digit code</strong> sent to your email at checkout.
-            Payment is blocked without it.
+            To buy, enter the <strong>5-digit checkout code</strong> at checkout. Payment is blocked
+            without it.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button
