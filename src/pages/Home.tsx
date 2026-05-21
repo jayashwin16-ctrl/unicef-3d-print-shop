@@ -5,7 +5,6 @@ import PageHero from "../components/site/PageHero";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
-import SiteDisclaimer from "../components/SiteDisclaimer";
 
 /** UNICEF’s seven regional offices (where much of their field work is organized). */
 const UNICEF_REGIONS = [
@@ -42,10 +41,6 @@ export default function Home() {
           Learn More
         </Link>
       </PageHero>
-
-      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
-        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
-      </div>
 
       <StatsBar
         stats={[
