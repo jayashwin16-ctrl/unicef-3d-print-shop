@@ -68,21 +68,17 @@ export default function Home() {
           <div className="flex-1 text-sm leading-relaxed text-[#333]">
             <p className="mb-3.5">
               <strong className="text-brand-heading">3D Prints for Good</strong> is an independent
-              student 3D print shop created by Jay. We make fidgets, figures, and collectibles for
-              you to enjoy.
+              student 3D print shop created by Jay, a 10 year old builder, under parent supervision.
+              Jay makes fidgets, figures, and collectibles for people to enjoy.
             </p>
             <p className="mb-3.5">
-              We donate{" "}
-              <span className="font-bold text-brand-blue">60% of proceeds from every purchase</span>{" "}
-              to <span className="font-bold text-brand-blue">UNICEF USA</span> to support children
+              60% of proceeds from every purchase is donated to{" "}
+              <span className="font-bold text-brand-blue">UNICEF USA</span> to support children
               worldwide.
             </p>
             <p>
-              Our goal is simple:{" "}
-              <span className="font-bold text-brand-blue-dark">
-                turn everyday purchases into support for children in need.
-              </span>{" "}
-              We are not affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
+              Jay&apos;s goal is simple: turn everyday purchases into support for children in need.
+              The site is not affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
             </p>
           </div>
         </div>
