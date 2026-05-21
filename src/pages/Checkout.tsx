@@ -25,10 +25,9 @@ function saveStoredState(s: CheckoutLocationState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-type Step = "flow" | "code" | "fulfillment" | "form" | "pay";
-type FlowType = "bobcat" | "regular" | null;
+type Step = "code" | "student" | "pay";
 
-const POST_VERIFY_STEPS: Step[] = ["fulfillment", "form", "pay"];
+const POST_VERIFY_STEPS: Step[] = ["student", "pay"];
 
 export default function Checkout() {
   const location = useLocation();
@@ -38,14 +37,11 @@ export default function Checkout() {
   const [source, setSource] = useState<CheckoutLocationState | null>(
     () => (location.state as CheckoutLocationState) || loadStoredState()
   );
-  const [localFulfillment, setLocalFulfillment] = useState<"pickup" | "delivery" | null>(null);
-  const [step, setStep] = useState<Step>("flow");
+  const [step, setStep] = useState<Step>("code");
   const [verified, setVerified] = useState(false);
   const [statusLoading, setStatusLoading] = useState(true);
-  const [flowType, setFlowType] = useState<FlowType>(null);
   const [codeInput, setCodeInput] = useState("");
-  const [bobcat, setBobcat] = useState({ name: "", grade: "", bobcatEmail: "" });
-  const [regular, setRegular] = useState({ name: "", email: "" });
+  const [student, setStudent] = useState({ name: "", grade: "", email: "" });
   const [verifying, setVerifying] = useState(false);
   const [paying, setPaying] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -55,7 +51,6 @@ export default function Checkout() {
     if (s) {
       setSource(s);
       saveStoredState(s);
-      if (s.buyNow?.fulfillment) setLocalFulfillment(s.buyNow.fulfillment);
     }
   }, [location.state]);
 
@@ -78,7 +73,6 @@ export default function Checkout() {
       if (cancelled) return;
       if (status.verified) {
         setVerified(true);
-        if (status.flowType) setFlowType(status.flowType);
       }
       setStatusLoading(false);
     })();
@@ -88,66 +82,28 @@ export default function Checkout() {
   }, []);
 
   const isCart = Boolean(source?.fromCart);
-  const effectiveFulfillment = useMemo((): "pickup" | "delivery" | null => {
-    if (isCart && source?.fulfillment) return source.fulfillment;
-    if (source?.buyNow) return localFulfillment || source.buyNow.fulfillment || null;
-    return null;
-  }, [isCart, source, localFulfillment]);
-
-  function stepAfterVerification() {
-    if (!source) return;
-    if (source.buyNow && !source.fromCart && !effectiveFulfillment) {
-      setStep("fulfillment");
-      return;
-    }
-    if (flowType) {
-      setStep("form");
-      return;
-    }
-    setStep("flow");
-  }
+  const effectiveFulfillment = useMemo((): "pickup" | "delivery" => {
+    return source?.fulfillment || source?.buyNow?.fulfillment || "pickup";
+  }, [source]);
 
   useEffect(() => {
     if (statusLoading) return;
     if (verified) {
-      if (step === "flow" || step === "code") {
-        stepAfterVerification();
+      if (step === "code") {
+        setStep("student");
       }
       return;
     }
     if (POST_VERIFY_STEPS.includes(step) || step === "pay") {
-      setStep(flowType ? "code" : "flow");
+      setStep("code");
     }
-  }, [verified, statusLoading]);
+  }, [verified, statusLoading, step]);
 
   if (!source) {
     return null;
   }
 
-  function goFulfillment(ful: "pickup" | "delivery") {
-    if (!source) return;
-    if (!verified) {
-      setErr("Enter the checkout code before continuing.");
-      setStep(flowType ? "code" : "flow");
-      return;
-    }
-    setLocalFulfillment(ful);
-    if (source.buyNow) {
-      const next: CheckoutLocationState = {
-        buyNow: { ...source.buyNow, fulfillment: ful },
-      };
-      setSource(next);
-      saveStoredState(next);
-    }
-    setStep("form");
-    setErr(null);
-  }
-
   async function verifyCode() {
-    if (!flowType) {
-      setErr("Choose Bobcat or Regular first.");
-      return;
-    }
     setErr(null);
     setVerifying(true);
     try {
@@ -155,14 +111,14 @@ export default function Checkout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ code: codeInput.trim(), flowType }),
+        body: JSON.stringify({ code: codeInput.trim(), flowType: "bobcat" }),
       });
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error || "Invalid code");
       }
       setVerified(true);
-      stepAfterVerification();
+      setStep("student");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
@@ -177,20 +133,13 @@ export default function Checkout() {
       setStep("code");
       return;
     }
-    if (!flowType || !effectiveFulfillment) {
-      setErr("Missing checkout options.");
+    if (!student.name.trim() || !student.grade.trim() || !student.email.trim()) {
+      setErr("Enter your name, grade, and email.");
       return;
     }
-    if (flowType === "bobcat") {
-      if (!bobcat.name.trim() || !bobcat.grade.trim() || !bobcat.bobcatEmail.trim()) {
-        setErr("Fill in name, grade, and school email.");
-        return;
-      }
-    } else {
-      if (!regular.name.trim() || !regular.email.trim()) {
-        setErr("Fill in name and email.");
-        return;
-      }
+    if (!student.email.includes("@")) {
+      setErr("Enter a valid email address.");
+      return;
     }
     setErr(null);
     setPaying(true);
@@ -199,18 +148,18 @@ export default function Checkout() {
       const body: Record<string, unknown> = {
         baseUrl,
         fulfillment: effectiveFulfillment,
-        checkoutType: flowType,
+        checkoutType: "bobcat",
+        bobcat: {
+          name: student.name.trim(),
+          grade: student.grade.trim(),
+          bobcatEmail: student.email.trim(),
+        },
       };
       if (isCart) {
         body.items = items.map(({ productId, quantity }) => ({ productId, quantity }));
       } else if (source.buyNow) {
         body.productId = source.buyNow.productId;
         body.quantity = source.buyNow.quantity;
-      }
-      if (flowType === "bobcat") {
-        body.bobcat = { name: bobcat.name, grade: bobcat.grade, bobcatEmail: bobcat.bobcatEmail };
-      } else {
-        body.regular = { name: regular.name, email: regular.email };
       }
 
       const res = await fetch("/api/create-checkout-session", {
@@ -248,6 +197,10 @@ export default function Checkout() {
       setStep("code");
       return;
     }
+    if (!student.name.trim() || !student.grade.trim()) {
+      setErr("Enter your name and grade.");
+      return;
+    }
     setStep("pay");
   }
 
@@ -263,15 +216,15 @@ export default function Checkout() {
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
       <p className="text-sm text-slate-600 mb-4">
-        Enter the 5-digit checkout code you were given to unlock payment. No email is sent.
+        Enter the 5-digit checkout code, then your student details, to pay.
       </p>
       {verified ? (
         <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
-          Code accepted — you can complete your order.
+          Code accepted — enter your name and grade below.
         </p>
       ) : (
         <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
-          Step 1: Enter the 5-digit code before you can pay.
+          Step 1: Enter the 5-digit code from the shop.
         </p>
       )}
       {err && (
@@ -280,35 +233,7 @@ export default function Checkout() {
         </p>
       )}
 
-      {step === "flow" && !verified && (
-        <div className="space-y-4">
-          <p className="font-medium text-slate-800">Who is checking out?</p>
-          <button
-            type="button"
-            onClick={() => {
-              setFlowType("bobcat");
-              setStep("code");
-              setErr(null);
-            }}
-            className="w-full rounded-xl border-2 border-[#1CABE2] bg-sky-50 p-4 text-left font-semibold text-slate-900 hover:bg-sky-100"
-          >
-            Bobcat (school) checkout
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFlowType("regular");
-              setStep("code");
-              setErr(null);
-            }}
-            className="w-full rounded-xl border-2 border-slate-200 bg-white p-4 text-left font-semibold text-slate-900 hover:bg-slate-50"
-          >
-            Regular pickup
-          </button>
-        </div>
-      )}
-
-      {step === "code" && flowType && !verified && (
+      {step === "code" && !verified && (
         <div className="space-y-4">
           <p className="text-sm text-slate-600">
             Enter the 5-digit checkout code (ask the shop if you do not have it).
@@ -330,64 +255,49 @@ export default function Checkout() {
           >
             {verifying ? "Checking…" : "Verify code to continue"}
           </button>
-          <button
-            type="button"
-            onClick={() => setStep("flow")}
-            className="text-sm text-brand-blue hover:underline"
-          >
-            ← Change checkout type
-          </button>
         </div>
       )}
 
-      {verified && source.buyNow && !source.fromCart && step === "fulfillment" && (
-        <div className="space-y-4">
-          <p className="font-medium text-slate-800">How do you want this order?</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => goFulfillment("pickup")}
-              className="rounded-full border-2 border-brand-blue bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Get in person
-            </button>
-            <button
-              type="button"
-              onClick={() => goFulfillment("delivery")}
-              className="rounded-full bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Delivered to you
-            </button>
-          </div>
-        </div>
-      )}
-
-      {verified && step === "form" && flowType === "bobcat" && (
+      {verified && step === "student" && (
         <div className="space-y-3">
-          <h2 className="font-bold text-slate-900">Bobcat details</h2>
+          <h2 className="font-bold text-slate-900">Student details</h2>
+          <p className="text-sm text-slate-600">Tell us who this order is for.</p>
           <div>
-            <label className="text-sm font-medium">Name</label>
+            <label htmlFor="student-name" className="text-sm font-medium">
+              Student name
+            </label>
             <input
+              id="student-name"
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={bobcat.name}
-              onChange={(e) => setBobcat((b) => ({ ...b, name: e.target.value }))}
+              value={student.name}
+              onChange={(e) => setStudent((s) => ({ ...s, name: e.target.value }))}
+              required
             />
           </div>
           <div>
-            <label className="text-sm font-medium">Grade</label>
+            <label htmlFor="student-grade" className="text-sm font-medium">
+              Grade
+            </label>
             <input
+              id="student-grade"
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={bobcat.grade}
-              onChange={(e) => setBobcat((b) => ({ ...b, grade: e.target.value }))}
+              value={student.grade}
+              onChange={(e) => setStudent((s) => ({ ...s, grade: e.target.value }))}
+              placeholder="e.g. 7th"
+              required
             />
           </div>
           <div>
-            <label className="text-sm font-medium">Bobcat school email</label>
+            <label htmlFor="student-email" className="text-sm font-medium">
+              Email (for payment receipt)
+            </label>
             <input
+              id="student-email"
               type="email"
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={bobcat.bobcatEmail}
-              onChange={(e) => setBobcat((b) => ({ ...b, bobcatEmail: e.target.value }))}
+              value={student.email}
+              onChange={(e) => setStudent((s) => ({ ...s, email: e.target.value }))}
+              required
             />
           </div>
           <button
@@ -400,39 +310,12 @@ export default function Checkout() {
         </div>
       )}
 
-      {verified && step === "form" && flowType === "regular" && (
-        <div className="space-y-3">
-          <h2 className="font-bold text-slate-900">Regular pickup details</h2>
-          <div>
-            <label className="text-sm font-medium">Name</label>
-            <input
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={regular.name}
-              onChange={(e) => setRegular((r) => ({ ...r, name: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">Email</label>
-            <input
-              type="email"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={regular.email}
-              onChange={(e) => setRegular((r) => ({ ...r, email: e.target.value }))}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={goToPayStep}
-            className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
-          >
-            Continue to payment
-          </button>
-        </div>
-      )}
-
-      {verified && step === "pay" && flowType && (
+      {verified && step === "pay" && (
         <div className="space-y-4">
-          <p className="text-slate-600">Code verified. You will be sent to our secure payment page.</p>
+          <p className="text-slate-600">
+            Order for <strong>{student.name}</strong>, grade <strong>{student.grade}</strong>.
+            You will be sent to our secure payment page.
+          </p>
           <button
             type="button"
             disabled={paying}
@@ -440,6 +323,13 @@ export default function Checkout() {
             className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white hover:bg-brand-blue-dark disabled:opacity-50"
           >
             {paying ? "Redirecting…" : "Pay now with card"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setStep("student")}
+            className="text-sm text-brand-blue hover:underline"
+          >
+            ← Edit student details
           </button>
         </div>
       )}

@@ -132,20 +132,9 @@ export default function Cart() {
                         if (itemCount === 0) return;
                         navigate("/checkout", { state: { fromCart: true, fulfillment: "pickup" } });
                       }}
-                      className="px-6 py-2.5 rounded-full border-2 border-brand-blue bg-brand-blue text-white font-semibold hover:bg-brand-blue-dark transition"
-                    >
-                      Get in person
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError(null);
-                        if (itemCount === 0) return;
-                        navigate("/checkout", { state: { fromCart: true, fulfillment: "delivery" } });
-                      }}
                       className="px-6 py-2.5 rounded-full bg-brand-blue text-white font-semibold hover:bg-brand-blue-dark transition"
                     >
-                      Delivered to you
+                      Checkout
                     </button>
                   </div>
                 </div>
@@ -156,21 +145,15 @@ export default function Cart() {
 
         <div className="lg:col-span-2 lg:sticky lg:top-24 space-y-3">
           <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="font-semibold text-slate-900">How do you want your order?</p>
+            <p className="font-semibold text-slate-900">Before you checkout</p>
             <p className="mt-2 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
               Checkout requires a <strong>5-digit code</strong> from the shop. You cannot pay without
               it.
             </p>
-            <ul className="mt-2 list-disc pl-5 text-sm text-slate-600 space-y-1">
-              <li>
-                <strong>Get in person</strong> — pay on the next screen; no shipping address there.
-                Use the <strong>school pickup form</strong> here.
-              </li>
-              <li>
-                <strong>Delivered to you</strong> — pay on the next screen; enter your{" "}
-                <strong>shipping address</strong> and phone there (Stripe).
-              </li>
-            </ul>
+            <p className="mt-2 text-sm text-slate-600">
+              School pickup? Use the <strong>school pickup form</strong> below before or after you
+              pay.
+            </p>
           </div>
           <SchoolPickupForm sectionId="school-pickup-cart" idSuffix="cart" />
         </div>
