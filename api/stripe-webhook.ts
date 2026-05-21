@@ -13,13 +13,21 @@ function getStripe(): Stripe {
 
 function readRawBody(req: VercelRequest): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
+    const chunks: Uint8Array[] = [];
     req.on("data", (chunk) => {
       chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     });
     req.on("end", () => resolve(Buffer.concat(chunks)));
     req.on("error", reject);
   });
+}
+
+/** Stripe signature verification needs the exact raw bytes Vercel received. */
+async function getRawBody(req: VercelRequest): Promise<Buffer> {
+  const body = req.body;
+  if (typeof body === "string") return Buffer.from(body, "utf8");
+  if (Buffer.isBuffer(body)) return body;
+  return readRawBody(req);
 }
 
 function generateVerificationPin(): string {
@@ -202,7 +210,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const rawBody = await readRawBody(req);
+    const rawBody = await getRawBody(req);
+    if (rawBody.length === 0) {
+      console.error("[stripe-webhook] Empty request body — check bodyParser: false and endpoint URL (use www, no redirect)");
+      res.status(400).json({ error: "Empty body" });
+      return;
+    }
+
     const event = getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
 
     if (event.type === "checkout.session.completed") {
@@ -213,7 +227,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const piId = getPaymentIntentId(session);
 
       if (piId) {
-        await attachPinToPaymentIntent(piId, pin);
+        try {
+          await attachPinToPaymentIntent(piId, pin);
+        } catch (e) {
+          console.error("[stripe-webhook] Failed to attach PIN to payment intent (emails will still send):", e);
+        }
       } else {
         console.warn("[stripe-webhook] No payment_intent on session; PIN not stored in Stripe metadata");
       }
