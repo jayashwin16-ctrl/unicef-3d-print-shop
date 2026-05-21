@@ -26,9 +26,9 @@ function saveStoredState(s: CheckoutLocationState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-type Step = "code" | "student" | "pay";
+type Step = "code" | "student" | "pickup" | "pay";
 
-const POST_VERIFY_STEPS: Step[] = ["student", "pay"];
+const POST_VERIFY_STEPS: Step[] = ["student", "pickup", "pay"];
 
 export default function Checkout() {
   const location = useLocation();
@@ -187,6 +187,16 @@ export default function Checkout() {
       setErr("Enter your name and grade.");
       return;
     }
+    setErr(null);
+    if (effectiveFulfillment === "pickup") {
+      setStep("pickup");
+    } else {
+      setStep("pay");
+    }
+  }
+
+  function completePickupAndPay() {
+    setErr(null);
     setStep("pay");
   }
 
@@ -283,20 +293,39 @@ export default function Checkout() {
             onClick={goToPayStep}
             className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
           >
-            Continue to payment
+            {effectiveFulfillment === "pickup" ? "Continue to school pickup" : "Continue to payment"}
           </button>
         </div>
       )}
 
-      {verified && step === "pay" && effectiveFulfillment === "pickup" && (
-        <div className="mb-6">
-          <SchoolPickupForm sectionId="school-pickup-checkout" idSuffix="checkout" />
+      {verified && step === "pickup" && effectiveFulfillment === "pickup" && (
+        <div className="space-y-4">
+          <h2 className="font-bold text-slate-900">School pickup</h2>
+          <p className="text-sm text-slate-600">
+            Step 3: Submit pickup details, then you&apos;ll go to payment.
+          </p>
+          <SchoolPickupForm
+            sectionId="school-pickup-checkout"
+            idSuffix="checkout"
+            onSubmitted={completePickupAndPay}
+          />
+          <button
+            type="button"
+            onClick={() => setStep("student")}
+            className="text-sm text-brand-blue hover:underline"
+          >
+            ← Edit student details
+          </button>
         </div>
       )}
 
       {verified && step === "pay" && (
         <div className="space-y-4">
+          <h2 className="font-bold text-slate-900">Payment</h2>
           <p className="text-slate-600">
+            {effectiveFulfillment === "pickup"
+              ? "Step 4: "
+              : "Step 3: "}
             Order for <strong>{student.name}</strong>, grade <strong>{student.grade}</strong>.
             You will be sent to our secure payment page.
           </p>

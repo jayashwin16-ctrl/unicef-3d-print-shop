@@ -4,16 +4,23 @@ type SchoolPickupFormProps = {
   sectionId?: string;
   idSuffix?: string;
   className?: string;
+  /** When set, called after a successful submit (e.g. advance checkout to payment). */
+  onSubmitted?: () => void;
 };
 
-export default function SchoolPickupForm({ sectionId, idSuffix = "", className = "" }: SchoolPickupFormProps) {
+export default function SchoolPickupForm({
+  sectionId,
+  idSuffix = "",
+  className = "",
+  onSubmitted,
+}: SchoolPickupFormProps) {
   const [pickupSubmitted, setPickupSubmitted] = useState(false);
   const suf = idSuffix ? `-${idSuffix}` : "";
 
   const handlePickupSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPickupSubmitted(true);
-    e.currentTarget.reset();
+    onSubmitted?.();
   };
 
   return (
@@ -25,11 +32,11 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
       <p className="mt-2 text-sm text-sky-800">
         For school pickup, share your full name, grade, and parent email.
       </p>
-      {pickupSubmitted && (
+      {pickupSubmitted ? (
         <p className="mt-4 rounded-lg bg-sky-200 px-3 py-2 text-sm font-medium text-sky-900">
-          Thanks! Your pickup details were submitted.
+          Thanks! Your pickup details were saved. Continue below to pay.
         </p>
-      )}
+      ) : (
       <form className="mt-5 space-y-4" onSubmit={handlePickupSubmit}>
         <div>
           <label htmlFor={`pickupName${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
@@ -77,6 +84,7 @@ export default function SchoolPickupForm({ sectionId, idSuffix = "", className =
           Submit pickup details
         </button>
       </form>
+      )}
     </section>
   );
 }
