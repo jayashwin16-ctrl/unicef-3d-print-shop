@@ -122,6 +122,10 @@ export default function ProductDetail() {
               {error}
             </p>
           )}
+          <p className="mt-4 text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
+            To buy, you must verify a <strong>6-digit code</strong> sent to your email at checkout.
+            Payment is blocked without it.
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"

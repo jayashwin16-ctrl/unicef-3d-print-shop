@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { fetchCheckoutStatus } from "../lib/checkoutVerification";
 
 const STORAGE_KEY = "checkout_flow_v1";
 
@@ -24,14 +25,10 @@ function saveStoredState(s: CheckoutLocationState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-type Step = "fulfillment" | "flow" | "email" | "code" | "form" | "pay";
+type Step = "flow" | "email" | "code" | "fulfillment" | "form" | "pay";
 type FlowType = "bobcat" | "regular" | null;
 
-function initialStep(s: CheckoutLocationState | null): Step {
-  if (!s) return "flow";
-  if (s.buyNow && !s.fromCart && !s.buyNow.fulfillment) return "fulfillment";
-  return "flow";
-}
+const POST_VERIFY_STEPS: Step[] = ["fulfillment", "form", "pay"];
 
 export default function Checkout() {
   const location = useLocation();
@@ -42,9 +39,9 @@ export default function Checkout() {
     () => (location.state as CheckoutLocationState) || loadStoredState()
   );
   const [localFulfillment, setLocalFulfillment] = useState<"pickup" | "delivery" | null>(null);
-  const [step, setStep] = useState<Step>(() =>
-    initialStep((location.state as CheckoutLocationState) || loadStoredState() || null)
-  );
+  const [step, setStep] = useState<Step>("flow");
+  const [verified, setVerified] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
   const [flowType, setFlowType] = useState<FlowType>(null);
   const [emailForCode, setEmailForCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
@@ -76,6 +73,23 @@ export default function Checkout() {
     }
   }, [source, itemCount, navigate]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const status = await fetchCheckoutStatus();
+      if (cancelled) return;
+      if (status.verified) {
+        setVerified(true);
+        if (status.flowType) setFlowType(status.flowType);
+        if (status.email) setEmailForCode(status.email);
+      }
+      setStatusLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const isCart = Boolean(source?.fromCart);
   const effectiveFulfillment = useMemo((): "pickup" | "delivery" | null => {
     if (isCart && source?.fulfillment) return source.fulfillment;
@@ -85,11 +99,43 @@ export default function Checkout() {
 
   const canShowTypeButtons = (isCart && !!source?.fulfillment) || (source?.buyNow && effectiveFulfillment !== null);
 
+  function stepAfterVerification() {
+    if (!source) return;
+    if (source.buyNow && !source.fromCart && !effectiveFulfillment) {
+      setStep("fulfillment");
+      return;
+    }
+    if (canShowTypeButtons || flowType) {
+      setStep("form");
+      return;
+    }
+    setStep("flow");
+  }
+
+  useEffect(() => {
+    if (statusLoading) return;
+    if (verified) {
+      if (step === "flow" || step === "email" || step === "code") {
+        stepAfterVerification();
+      }
+      return;
+    }
+    if (POST_VERIFY_STEPS.includes(step) || step === "pay") {
+      setStep(flowType ? "email" : "flow");
+    }
+  }, [verified, statusLoading]);
+
   if (!source) {
     return null;
   }
 
   function goFulfillment(ful: "pickup" | "delivery") {
+    if (!source) return;
+    if (!verified) {
+      setErr("Enter the email verification code before continuing.");
+      setStep(flowType ? "email" : "flow");
+      return;
+    }
     setLocalFulfillment(ful);
     if (source.buyNow) {
       const next: CheckoutLocationState = {
@@ -98,7 +144,7 @@ export default function Checkout() {
       setSource(next);
       saveStoredState(next);
     }
-    setStep("flow");
+    setStep("form");
     setErr(null);
   }
 
@@ -128,7 +174,7 @@ export default function Checkout() {
               "API route not found. Run npm run dev (starts Vercel + API). UI-only: npm run dev:vite won't load /api.";
           } else if (raw.includes("FUNCTION_INVOCATION_FAILED")) {
             msg =
-              "Checkout API failed to start on the server. After the latest deploy, confirm CHECKOUT_SESSION_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL are set in Vercel → Settings → Environment Variables, then redeploy.";
+              "Checkout API failed to start on the server. Confirm CHECKOUT_SESSION_SECRET, RESEND_API_KEY, and RESEND_FROM_EMAIL on Vercel, then redeploy.";
           } else if (raw.trim()) {
             msg = raw.slice(0, 200);
           }
@@ -157,7 +203,8 @@ export default function Checkout() {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error || "Invalid code");
       }
-      setStep("form");
+      setVerified(true);
+      stepAfterVerification();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
@@ -166,6 +213,12 @@ export default function Checkout() {
   }
 
   async function goPay() {
+    if (!source) return;
+    if (!verified) {
+      setErr("You must verify the 6-digit email code before paying.");
+      setStep("code");
+      return;
+    }
     if (!flowType || !effectiveFulfillment) {
       setErr("Missing checkout options.");
       return;
@@ -218,45 +271,59 @@ export default function Checkout() {
       }
       throw new Error("No checkout URL");
     } catch (e) {
-      navigate("/checkout/payment-error");
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("verification") || msg.includes("code")) {
+        setVerified(false);
+        setStep("code");
+        setErr(msg);
+      } else {
+        navigate("/checkout/payment-error");
+      }
     } finally {
       setPaying(false);
     }
   }
 
+  function goToPayStep() {
+    if (!verified) {
+      setErr("Verify the 6-digit code from your email before payment.");
+      setStep("code");
+      return;
+    }
+    setStep("pay");
+  }
+
+  if (statusLoading) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-10">
+        <p className="text-slate-600">Checking verification…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
-      <p className="text-sm text-slate-600 mb-6">Complete each step, then you will go to payment.</p>
+      <p className="text-sm text-slate-600 mb-4">
+        Purchases are only allowed after you verify the one-time code we email you. Payment will not
+        work without it.
+      </p>
+      {verified ? (
+        <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
+          Email verified — you can complete your order.
+        </p>
+      ) : (
+        <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
+          Step 1: Get and enter your 6-digit code before you can pay.
+        </p>
+      )}
       {err && (
         <p className="mb-4 text-sm text-red-600" role="alert">
           {err}
         </p>
       )}
 
-      {source.buyNow && !source.fromCart && step === "fulfillment" && (
-        <div className="space-y-4">
-          <p className="font-medium text-slate-800">How do you want this order?</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => goFulfillment("pickup")}
-              className="rounded-full border-2 border-brand-blue bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Get in person
-            </button>
-            <button
-              type="button"
-              onClick={() => goFulfillment("delivery")}
-              className="rounded-full bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
-            >
-              Delivered to you
-            </button>
-          </div>
-        </div>
-      )}
-
-      {canShowTypeButtons && step === "flow" && (
+      {step === "flow" && !verified && (
         <div className="space-y-4">
           <p className="font-medium text-slate-800">Who is checking out?</p>
           <button
@@ -284,11 +351,11 @@ export default function Checkout() {
         </div>
       )}
 
-      {step === "email" && flowType && (
+      {step === "email" && flowType && !verified && (
         <div className="space-y-4">
           <p className="text-sm text-slate-600">
-            Enter the buyer email. We will send a one-time code here, and after verification this
-            same email is passed into payment as the buyer email.
+            Enter the buyer email. We will send a one-time 6-digit code. You must enter that code to
+            unlock payment.
           </p>
           <div>
             <label htmlFor="cemail" className="mb-1 block text-sm font-medium text-slate-700">
@@ -314,7 +381,7 @@ export default function Checkout() {
         </div>
       )}
 
-      {step === "code" && flowType && (
+      {step === "code" && flowType && !verified && (
         <div className="space-y-4">
           <p className="text-sm text-slate-600">Enter the 6-digit code we emailed you.</p>
           <input
@@ -332,12 +399,34 @@ export default function Checkout() {
             onClick={verifyCode}
             className="w-full rounded-full bg-brand-blue py-3 font-semibold text-white disabled:opacity-50"
           >
-            {verifying ? "Verifying…" : "Verify code"}
+            {verifying ? "Verifying…" : "Verify code to continue"}
           </button>
         </div>
       )}
 
-      {step === "form" && flowType === "bobcat" && (
+      {verified && source.buyNow && !source.fromCart && step === "fulfillment" && (
+        <div className="space-y-4">
+          <p className="font-medium text-slate-800">How do you want this order?</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => goFulfillment("pickup")}
+              className="rounded-full border-2 border-brand-blue bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
+            >
+              Get in person
+            </button>
+            <button
+              type="button"
+              onClick={() => goFulfillment("delivery")}
+              className="rounded-full bg-brand-blue px-5 py-3 font-semibold text-white hover:bg-brand-blue-dark"
+            >
+              Delivered to you
+            </button>
+          </div>
+        </div>
+      )}
+
+      {verified && step === "form" && flowType === "bobcat" && (
         <div className="space-y-3">
           <h2 className="font-bold text-slate-900">Bobcat details</h2>
           <div>
@@ -367,7 +456,7 @@ export default function Checkout() {
           </div>
           <button
             type="button"
-            onClick={() => setStep("pay")}
+            onClick={goToPayStep}
             className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
           >
             Continue to payment
@@ -375,7 +464,7 @@ export default function Checkout() {
         </div>
       )}
 
-      {step === "form" && flowType === "regular" && (
+      {verified && step === "form" && flowType === "regular" && (
         <div className="space-y-3">
           <h2 className="font-bold text-slate-900">Regular pickup details</h2>
           <div>
@@ -397,7 +486,7 @@ export default function Checkout() {
           </div>
           <button
             type="button"
-            onClick={() => setStep("pay")}
+            onClick={goToPayStep}
             className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
           >
             Continue to payment
@@ -405,9 +494,9 @@ export default function Checkout() {
         </div>
       )}
 
-      {step === "pay" && flowType && (
+      {verified && step === "pay" && flowType && (
         <div className="space-y-4">
-          <p className="text-slate-600">You will be sent to our secure payment page.</p>
+          <p className="text-slate-600">Code verified. You will be sent to our secure payment page.</p>
           <button
             type="button"
             disabled={paying}
