@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import SchoolPickupForm from "../components/SchoolPickupForm";
+import SchoolPickupForm, { type PickupDetails } from "../components/SchoolPickupForm";
 
 const STORAGE_KEY = "checkout_flow_v1";
 const VERIFIED_SESSION_KEY = "checkout_verified_session";
@@ -26,9 +26,9 @@ function saveStoredState(s: CheckoutLocationState) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-type Step = "code" | "student" | "pickup" | "pay";
+type Step = "code" | "pickup" | "pay";
 
-const POST_VERIFY_STEPS: Step[] = ["student", "pickup", "pay"];
+const POST_VERIFY_STEPS: Step[] = ["pickup", "pay"];
 
 export default function Checkout() {
   const location = useLocation();
@@ -41,7 +41,7 @@ export default function Checkout() {
   const [step, setStep] = useState<Step>("code");
   const [verified, setVerified] = useState(false);
   const [codeInput, setCodeInput] = useState("");
-  const [student, setStudent] = useState({ name: "", grade: "", email: "" });
+  const [pickupDetails, setPickupDetails] = useState<PickupDetails | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [paying, setPaying] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export default function Checkout() {
   }, [source]);
 
   useEffect(() => {
-    if (!verified && (POST_VERIFY_STEPS.includes(step) || step === "pay")) {
+    if (!verified && POST_VERIFY_STEPS.includes(step)) {
       setStep("code");
     }
   }, [verified, step]);
@@ -103,7 +103,7 @@ export default function Checkout() {
       }
       setVerified(true);
       sessionStorage.setItem(VERIFIED_SESSION_KEY, "1");
-      setStep("student");
+      setStep("pickup");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
@@ -118,12 +118,14 @@ export default function Checkout() {
       setStep("code");
       return;
     }
-    if (!student.name.trim() || !student.grade.trim() || !student.email.trim()) {
-      setErr("Enter your name, grade, and email.");
+    if (!pickupDetails?.name.trim() || !pickupDetails?.grade.trim() || !pickupDetails?.email.trim()) {
+      setErr("Submit school pickup details before paying.");
+      setStep("pickup");
       return;
     }
-    if (!student.email.includes("@")) {
-      setErr("Enter a valid email address.");
+    if (!pickupDetails.email.includes("@")) {
+      setErr("Enter a valid parent email.");
+      setStep("pickup");
       return;
     }
     setErr(null);
@@ -135,9 +137,9 @@ export default function Checkout() {
         fulfillment: effectiveFulfillment,
         checkoutType: "bobcat",
         bobcat: {
-          name: student.name.trim(),
-          grade: student.grade.trim(),
-          bobcatEmail: student.email.trim(),
+          name: pickupDetails.name.trim(),
+          grade: pickupDetails.grade.trim(),
+          bobcatEmail: pickupDetails.email.trim(),
         },
       };
       if (isCart) {
@@ -177,25 +179,8 @@ export default function Checkout() {
     }
   }
 
-  function goToPayStep() {
-    if (!verified) {
-      setErr("Enter the checkout code before payment.");
-      setStep("code");
-      return;
-    }
-    if (!student.name.trim() || !student.grade.trim()) {
-      setErr("Enter your name and grade.");
-      return;
-    }
-    setErr(null);
-    if (effectiveFulfillment === "pickup") {
-      setStep("pickup");
-    } else {
-      setStep("pay");
-    }
-  }
-
-  function completePickupAndPay() {
+  function completePickupAndPay(details: PickupDetails) {
+    setPickupDetails(details);
     setErr(null);
     setStep("pay");
   }
@@ -204,11 +189,11 @@ export default function Checkout() {
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
       <p className="text-sm text-slate-600 mb-4">
-        Enter the 5-digit checkout code, then your student details, to pay.
+        Enter the checkout code, then school pickup details, to pay.
       </p>
       {verified ? (
         <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
-          Code accepted — enter your name and grade below.
+          Code accepted — complete school pickup below.
         </p>
       ) : (
         <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900">
@@ -246,88 +231,23 @@ export default function Checkout() {
         </div>
       )}
 
-      {verified && step === "student" && (
-        <div className="space-y-3">
-          <h2 className="font-bold text-slate-900">Student details</h2>
-          <p className="text-sm text-slate-600">Tell us who this order is for.</p>
-          <div>
-            <label htmlFor="student-name" className="text-sm font-medium">
-              Student name
-            </label>
-            <input
-              id="student-name"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={student.name}
-              onChange={(e) => setStudent((s) => ({ ...s, name: e.target.value }))}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="student-grade" className="text-sm font-medium">
-              Grade
-            </label>
-            <input
-              id="student-grade"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={student.grade}
-              onChange={(e) => setStudent((s) => ({ ...s, grade: e.target.value }))}
-              placeholder="e.g. 7th"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="student-email" className="text-sm font-medium">
-              Email (for payment receipt)
-            </label>
-            <input
-              id="student-email"
-              type="email"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={student.email}
-              onChange={(e) => setStudent((s) => ({ ...s, email: e.target.value }))}
-              required
-            />
-          </div>
-          <button
-            type="button"
-            onClick={goToPayStep}
-            className="mt-2 w-full rounded-full bg-brand-blue py-3 font-semibold text-white"
-          >
-            {effectiveFulfillment === "pickup" ? "Continue to school pickup" : "Continue to payment"}
-          </button>
-        </div>
-      )}
-
-      {verified && step === "pickup" && effectiveFulfillment === "pickup" && (
+      {verified && step === "pickup" && (
         <div className="space-y-4">
-          <h2 className="font-bold text-slate-900">School pickup</h2>
-          <p className="text-sm text-slate-600">
-            Step 3: Submit pickup details, then you&apos;ll go to payment.
-          </p>
+          <p className="text-sm text-slate-600">Step 2: School pickup and contact details.</p>
           <SchoolPickupForm
             sectionId="school-pickup-checkout"
             idSuffix="checkout"
             onSubmitted={completePickupAndPay}
           />
-          <button
-            type="button"
-            onClick={() => setStep("student")}
-            className="text-sm text-brand-blue hover:underline"
-          >
-            ← Edit student details
-          </button>
         </div>
       )}
 
-      {verified && step === "pay" && (
+      {verified && step === "pay" && pickupDetails && (
         <div className="space-y-4">
           <h2 className="font-bold text-slate-900">Payment</h2>
           <p className="text-slate-600">
-            {effectiveFulfillment === "pickup"
-              ? "Step 4: "
-              : "Step 3: "}
-            Order for <strong>{student.name}</strong>, grade <strong>{student.grade}</strong>.
-            You will be sent to our secure payment page.
+            Step 3: Order for <strong>{pickupDetails.name}</strong>, grade{" "}
+            <strong>{pickupDetails.grade}</strong>. You will be sent to our secure payment page.
           </p>
           <button
             type="button"
@@ -339,10 +259,10 @@ export default function Checkout() {
           </button>
           <button
             type="button"
-            onClick={() => setStep("student")}
+            onClick={() => setStep("pickup")}
             className="text-sm text-brand-blue hover:underline"
           >
-            ← Edit student details
+            ← Edit pickup details
           </button>
         </div>
       )}
