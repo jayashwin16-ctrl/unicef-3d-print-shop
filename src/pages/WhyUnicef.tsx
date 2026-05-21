@@ -38,7 +38,7 @@ export default function WhyUnicef() {
             education, and emergency relief—wherever children are most vulnerable.
           </p>
           <p>
-            Our shop is independent. We donate a portion of proceeds to UNICEF USA because their work
+            Our shop is independent. We donate 60% of proceeds from every purchase to UNICEF USA because their work
             helps keep children safe, healthy, and learning.
           </p>
         </InfoBlock>
@@ -76,7 +76,7 @@ export default function WhyUnicef() {
             >
               unicefusa.org
             </a>
-            —or buy a 3D print from us. A portion of each sale is donated to UNICEF USA.
+            —or buy a 3D print from us. We donate 60% of proceeds from every purchase to UNICEF USA.
           </p>
           <p>
             <Link to="/shop" className="font-bold text-brand-blue-dark underline">

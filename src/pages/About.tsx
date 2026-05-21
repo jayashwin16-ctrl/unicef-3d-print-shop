@@ -55,8 +55,8 @@ export default function About() {
       <Section title="How the shop works" alt>
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            Every item in our shop is 3D-printed in durable PLA. A portion of each sale is donated to
-            UNICEF USA to support children&apos;s health, education, and protection.
+            Every item in our shop is 3D-printed in durable PLA. We donate 60% of proceeds from every
+            purchase to UNICEF USA to support children&apos;s health, education, and protection.
           </p>
           <p>
             You can buy online with secure checkout, pick up at school (see the form below), or

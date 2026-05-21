@@ -33,7 +33,7 @@ export default function Home() {
             <span>Through Every Purchase</span>
           </>
         }
-        subtitle="We sell 3D-printed items and donate a portion of proceeds to UNICEF USA. Your purchase supports creative prints and charitable giving."
+        subtitle="We sell 3D-printed items and donate 60% of proceeds from every purchase to UNICEF USA."
       >
         <Link to="/shop" className="btn-primary">
           Shop
@@ -51,7 +51,7 @@ export default function Home() {
         stats={[
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
           { value: "7", label: "Global regions we highlight", tone: "dark" },
-          { value: "Portion", label: "Of proceeds donated", tone: "green" },
+          { value: "60%", label: "Of proceeds donated", tone: "green" },
           { value: "$10+", label: "Prints that make a difference", tone: "dark" },
         ]}
       />
@@ -68,9 +68,14 @@ export default function Home() {
           <div className="flex-1 text-sm leading-relaxed text-[#333]">
             <p className="mb-3.5">
               <strong className="text-brand-heading">3D Prints for Good</strong> is an independent
-              student 3D print shop created by Jay. We make fidgets, figures, and collectibles—and
-              donate a portion of proceeds to{" "}
-              <span className="font-bold text-brand-blue">UNICEF USA</span>.
+              student 3D print shop created by Jay. We make fidgets, figures, and collectibles for
+              you to enjoy.
+            </p>
+            <p className="mb-3.5">
+              We donate{" "}
+              <span className="font-bold text-brand-blue">60% of proceeds from every purchase</span>{" "}
+              to <span className="font-bold text-brand-blue">UNICEF USA</span> to support children
+              worldwide.
             </p>
             <p>
               Our goal is simple:{" "}
@@ -120,7 +125,7 @@ export default function Home() {
               <ProductImage product={p} className="h-40" />
               <div className="p-4">
                 <h3 className="font-semibold text-brand-heading">{p.title}</h3>
-                <p className="mt-1 text-sm text-brand-blue-dark">{p.donationPercent}% pledged</p>
+                <p className="mt-1 text-sm text-brand-blue-dark">{p.donationPercent}% donated</p>
                 <p className="mt-2 font-medium text-brand-heading">
                   {p.currency} {p.price}
                 </p>

@@ -62,8 +62,8 @@ const GLOBAL_FACTS = [
     source: "UNICEF",
   },
   {
-    number: "~50%",
-    text: "Of each sale from our shop, a portion is donated to UNICEF USA (independent student project).",
+    number: "60%",
+    text: "Of proceeds from each sale on our shop goes to UNICEF USA (independent student project).",
     source: "3D Prints for Good",
   },
 ];
@@ -130,8 +130,9 @@ export default function Stats() {
       <Section title="How our shop fits in">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            We are not a large charity—we are an independent student 3D print shop. A portion of each
-            sale is donated to UNICEF USA to support children in regions like those described above.
+            We are not a large charity—we are an independent student 3D print shop. We donate 60% of
+            proceeds from every purchase to UNICEF USA to support children in regions like those
+            described above.
           </p>
           <p>
             Small purchases add up when many people participate. Thank you for supporting this

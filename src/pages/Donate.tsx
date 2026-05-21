@@ -86,7 +86,7 @@ export default function Donate() {
       <Section title="How this relates to our shop" alt>
         <div className="mx-auto max-w-xl space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            When you buy from our shop, a portion of proceeds is donated to UNICEF USA. That is
+            When you buy from our shop, we donate 60% of proceeds from every purchase to UNICEF USA. That is
             separate from donating directly on unicefusa.org.
           </p>
           <p>

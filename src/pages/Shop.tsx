@@ -14,7 +14,7 @@ export default function Shop() {
             3D Prints That <span className="text-brand-blue">Give Back</span>
           </>
         }
-        subtitle="All items are 3D-printed in PLA. Donation percentages are pledged from each sale."
+        subtitle="All items are 3D-printed in PLA. We donate 60% of proceeds from every purchase to UNICEF USA."
       />
 
       <Section>
@@ -39,7 +39,7 @@ export default function Shop() {
                     {p.currency} {p.price}
                   </span>
                   <span className="rounded bg-[#e3f2fd] px-2 py-1 text-sm text-brand-blue-dark">
-                    {p.donationPercent}% pledged
+                    {p.donationPercent}% donated
                   </span>
                 </div>
               </div>

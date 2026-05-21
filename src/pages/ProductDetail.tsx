@@ -113,8 +113,8 @@ export default function ProductDetail() {
             {product.currency} {product.price}
           </p>
           <p className="mt-2 text-sm text-brand-blue-dark">
-            A portion of this item&apos;s price is donated to UNICEF USA (independent student project; not
-            affiliated with or endorsed by UNICEF or UNICEF USA).
+            {product.donationPercent}% of proceeds from this item is donated to UNICEF USA (independent
+            student project; not affiliated with or endorsed by UNICEF or UNICEF USA).
           </p>
           <div className="mt-6">
             <SchoolPickupBanner />
