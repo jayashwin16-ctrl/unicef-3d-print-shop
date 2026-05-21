@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
-import SchoolPickupForm from "../components/SchoolPickupForm";
 import SiteDisclaimer from "../components/SiteDisclaimer";
 
 export default function About() {
@@ -59,8 +58,8 @@ export default function About() {
             purchase to UNICEF USA to support children&apos;s health, education, and protection.
           </p>
           <p>
-            You can buy online with secure checkout, pick up at school (see the form below), or
-            choose shipping when you pay. Thank you for supporting this project!
+            You can buy online with secure checkout and pick up at school. School pickup details are
+            collected on the checkout page. Thank you for supporting this project!
           </p>
           <p>
             For official donations directly to UNICEF USA, visit{" "}
@@ -75,10 +74,6 @@ export default function About() {
             .
           </p>
         </div>
-      </Section>
-
-      <Section>
-        <SchoolPickupForm sectionId="school-pickup" />
       </Section>
 
       <Section alt>

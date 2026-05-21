@@ -203,7 +203,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const shippingOptions = getShippingOptions();
-    const pickupFormCartUrl = `${origin}/cart#school-pickup-cart`;
+    const pickupFormCheckoutUrl = `${origin}/checkout#school-pickup-checkout`;
 
     const meta: NonNullable<Stripe.Checkout.SessionCreateParams["metadata"]> = {
       code_verified: "true",
@@ -236,13 +236,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (shippingOptions) sessionParams.shipping_options = shippingOptions;
       sessionParams.custom_text = {
         submit: {
-          message: `Shipping: enter your address on this page. School pickup instead? Use “Get in person” on our Cart, or fill the pickup form: ${pickupFormCartUrl}`,
+          message: `Shipping: enter your address on this page. School pickup instead? Fill the pickup form at checkout: ${pickupFormCheckoutUrl}`,
         },
       };
     } else {
       sessionParams.custom_text = {
         submit: {
-          message: `In-person pickup: fill out the school pickup form on our site before or after paying: ${pickupFormCartUrl}`,
+          message: `In-person pickup: fill out the school pickup form at checkout before or after paying: ${pickupFormCheckoutUrl}`,
         },
       };
     }

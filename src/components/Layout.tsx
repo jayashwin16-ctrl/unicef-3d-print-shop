@@ -93,7 +93,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <p className="mt-2 text-xs text-brand-dim">This project was created by Jay.</p>
         <p className="mt-2 text-xs text-brand-dim">
           <Link to="/about" className="underline hover:text-brand-heading">
-            About & school pickup
+            About
           </Link>
           {" · "}
           <a

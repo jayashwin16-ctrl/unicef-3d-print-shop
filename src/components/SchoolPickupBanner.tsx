@@ -5,15 +5,15 @@ export default function SchoolPickupBanner() {
     <div className="rounded-xl border border-sky-300 bg-sky-50 p-4 text-sm text-sky-900 shadow-sm">
       <p className="font-semibold">School pickup</p>
       <p className="mt-1 text-sky-800">
-        If you will pick up at school, fill out the <strong>pickup form</strong> on the{" "}
-        <strong>Cart</strong> page (next to your order). Shipping address is entered on the next
-        step (Stripe). You can submit the form before or after you pay.
+        If you will pick up at school, fill out the <strong>pickup form</strong> on the checkout
+        page before you pay. You can also complete it after payment from the link in your receipt
+        email.
       </p>
       <Link
-        to="/cart#school-pickup-cart"
+        to="/cart"
         className="mt-2 inline-block font-semibold text-sky-800 underline hover:text-sky-950"
       >
-        Go to Cart — pickup form →
+        Go to cart → checkout
       </Link>
     </div>
   );

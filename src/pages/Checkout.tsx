@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import SchoolPickupForm from "../components/SchoolPickupForm";
 
 const STORAGE_KEY = "checkout_flow_v1";
 const VERIFIED_SESSION_KEY = "checkout_verified_session";
@@ -284,6 +285,12 @@ export default function Checkout() {
           >
             Continue to payment
           </button>
+        </div>
+      )}
+
+      {verified && step === "pay" && effectiveFulfillment === "pickup" && (
+        <div className="mb-6">
+          <SchoolPickupForm sectionId="school-pickup-checkout" idSuffix="checkout" />
         </div>
       )}
 
