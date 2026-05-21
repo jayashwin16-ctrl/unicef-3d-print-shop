@@ -34,8 +34,8 @@ export default function Home() {
         }
         subtitle="We sell 3D-printed items and pledge a share of each sale to support children. Your purchase funds creative prints—and real impact."
       >
-        <Link to="/donate" className="btn-primary">
-          Donate / Shop
+        <Link to="/shop" className="btn-primary">
+          Shop
         </Link>
         <Link to="/problem" className="btn-outline">
           Learn More
@@ -136,8 +136,8 @@ export default function Home() {
       <CtaBanner
         title="Ready to Make a Difference?"
         text="Shop our prints or learn how your purchase supports children."
-        buttonLabel="Donate / Shop Now"
-        to="/donate"
+        buttonLabel="Shop Now"
+        to="/shop"
       />
     </>
   );

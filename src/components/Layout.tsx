@@ -7,7 +7,7 @@ const NAV = [
   { path: "/problem", label: "The Problem" },
   { path: "/stats", label: "Stats & Data" },
   { path: "/why", label: "Why UNICEF" },
-  { path: "/shop", label: "Shop" },
+  { path: "/donate", label: "Donate" },
   { path: "/about", label: "About" },
 ] as const;
 
@@ -22,6 +22,12 @@ export default function Layout({ children }: { children: ReactNode }) {
       ? "border-b-2 border-brand-blue pb-0.5 font-semibold text-brand-heading"
       : "text-brand-muted hover:text-brand-heading";
   };
+
+  const shopActive =
+    loc.pathname === "/shop" || loc.pathname.startsWith("/product");
+  const shopClass = shopActive
+    ? "rounded-md bg-brand-blue-dark px-3.5 py-1.5 font-bold text-white"
+    : "rounded-md bg-brand-blue px-3.5 py-1.5 font-bold text-white hover:opacity-90";
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
@@ -52,16 +58,8 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </li>
               ))}
               <li>
-                <Link
-                  to="/donate"
-                  className={`rounded-md px-3.5 py-1.5 font-bold text-white ${
-                    loc.pathname === "/donate"
-                      ? "bg-brand-blue-dark"
-                      : "bg-brand-blue hover:opacity-90"
-                  }`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Donate
+                <Link to="/shop" className={shopClass} onClick={() => setMenuOpen(false)}>
+                  Shop
                 </Link>
               </li>
             </ul>
