@@ -14,7 +14,7 @@ export default function ProductImage({
 }: ProductImageProps) {
   const [imageError, setImageError] = useState(false);
   const imageAlt = alt || product.title;
-  const gradientClass = `bg-gradient-to-br ${product.imageGradient ?? "from-unicef-blue to-unicef-dark"}`;
+  const gradientClass = `bg-gradient-to-br ${product.imageGradient ?? "from-print-from to-print-to"}`;
   
   const imageUrl = product.images?.[0] || product.image;
 

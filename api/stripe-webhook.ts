@@ -107,8 +107,8 @@ async function sendThankYouEmail(params: {
   const lines = [
     "Thank you for your order from 3D Prints for Good!",
     "",
-    "Your payment was successful. We appreciate your support — part of each sale goes toward",
-    "children-focused giving aligned with UNICEF's mission.",
+    "Your payment was successful. We appreciate your support — a portion of proceeds is donated to UNICEF USA.",
+    "3D Prints for Good is an independent student project, not affiliated with or endorsed by UNICEF or UNICEF USA.",
     "",
     `Amount paid: ${amount}`,
     `Order reference: ${sessionId}`,

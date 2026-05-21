@@ -63,7 +63,7 @@ const GLOBAL_FACTS = [
   },
   {
     number: "~50%",
-    text: "Of each sale from our shop pledged toward children-focused giving aligned with UNICEF's mission.",
+    text: "Of each sale from our shop, a portion is donated to UNICEF USA (independent student project).",
     source: "3D Prints for Good",
   },
 ];
@@ -99,16 +99,16 @@ export default function Stats() {
           ))}
         </div>
         <p className="mx-auto mt-8 max-w-xl text-center text-sm text-brand-muted">
-          This site is an independent student project. For official UNICEF data and reports, visit{" "}
+          Facts above cite UNICEF regional sources. For official UNICEF USA information, visit{" "}
           <a
-            href="https://www.unicef.org/reports"
+            href="https://www.unicefusa.org"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-brand-blue underline"
           >
-            unicef.org/reports
+            unicefusa.org
           </a>
-          .
+          . This site is not affiliated with or endorsed by UNICEF or UNICEF USA.
         </p>
       </Section>
 
@@ -130,13 +130,12 @@ export default function Stats() {
       <Section title="How our shop fits in">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            We are not a large charity—we are a 3D print shop with a pledge. Each product lists the
-            percentage of that sale we set aside for giving aligned with UNICEF&apos;s values,
-            across all the regions where UNICEF works.
+            We are not a large charity—we are an independent student 3D print shop. A portion of each
+            sale is donated to UNICEF USA to support children in regions like those described above.
           </p>
           <p>
-            Buying a $10 fidget can mean $5 pledged. Buying a $28 figure can mean $14 pledged. Small
-            purchases add up when many people participate.
+            Small purchases add up when many people participate. Thank you for supporting this
+            project.
           </p>
         </div>
         <p className="mt-8 text-center">
@@ -148,7 +147,7 @@ export default function Stats() {
 
       <CtaBanner
         title="Turn data into action"
-        text="Shop prints or give directly through UNICEF."
+        text="Shop prints or give directly through UNICEF USA."
         buttonLabel="Donate / Shop Now"
         to="/donate"
       />

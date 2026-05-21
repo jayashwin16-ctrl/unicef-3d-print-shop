@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
+import SiteDisclaimer from "../components/SiteDisclaimer";
 
 function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -17,14 +18,18 @@ export default function WhyUnicef() {
   return (
     <>
       <PageHero
-        label="Our Partner Mission"
+        label="Why we give"
         title={
           <>
-            Why <span className="text-brand-blue">UNICEF</span>?
+            Why <span className="text-brand-blue">UNICEF USA</span>?
           </>
         }
-        subtitle="UNICEF works in more than 190 countries and territories to save children's lives and help them reach their full potential."
+        subtitle="UNICEF USA supports programs that help children in more than 190 countries and territories."
       />
+
+      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
+        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
+      </div>
 
       <Section>
         <InfoBlock title="🌍 Focused on children">
@@ -33,8 +38,8 @@ export default function WhyUnicef() {
             education, and emergency relief—wherever children are most vulnerable.
           </p>
           <p>
-            Our shop is independent, but we align our pledged giving with UNICEF&apos;s values: every
-            child safe, healthy, and learning.
+            Our shop is independent. We donate a portion of proceeds to UNICEF USA because their work
+            helps keep children safe, healthy, and learning.
           </p>
         </InfoBlock>
       </Section>
@@ -64,15 +69,14 @@ export default function WhyUnicef() {
           <p>
             You can give directly at{" "}
             <a
-              href="https://www.unicef.org"
+              href="https://www.unicefusa.org"
               target="_blank"
               rel="noopener noreferrer"
               className="font-bold text-brand-blue underline"
             >
-              unicef.org
+              unicefusa.org
             </a>
-            —or buy a 3D print from us. We pledge about 50% of each product&apos;s price toward
-            children-focused giving.
+            —or buy a 3D print from us. A portion of each sale is donated to UNICEF USA.
           </p>
           <p>
             <Link to="/shop" className="font-bold text-brand-blue-dark underline">
@@ -84,7 +88,7 @@ export default function WhyUnicef() {
 
       <CtaBanner
         title="Support children today"
-        text="Shop our prints or donate directly through UNICEF."
+        text="Shop our prints or donate directly through UNICEF USA."
         buttonLabel="Donate / Shop Now"
         to="/donate"
       />

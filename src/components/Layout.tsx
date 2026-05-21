@@ -1,12 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import SiteDisclaimer from "./SiteDisclaimer";
 
 const NAV = [
   { path: "/", label: "Home" },
   { path: "/problem", label: "The Problem" },
   { path: "/stats", label: "Stats & Data" },
-  { path: "/why", label: "Why UNICEF" },
+  { path: "/why", label: "Why give" },
   { path: "/donate", label: "Donate" },
   { path: "/about", label: "About" },
 ] as const;
@@ -88,22 +89,20 @@ export default function Layout({ children }: { children: ReactNode }) {
       </header>
       <main className="flex-1">{children}</main>
       <footer className="border-t border-brand-border bg-brand-card px-6 py-5 text-center">
-        <p className="text-xs text-brand-dim">
-          3D Prints for Good — Student-led 3D print shop · Pledged giving aligned with UNICEF values
-        </p>
-        <p className="mt-1 text-xs text-brand-dim">This project was created by Jay.</p>
+        <SiteDisclaimer className="mx-auto max-w-2xl text-xs" />
+        <p className="mt-2 text-xs text-brand-dim">This project was created by Jay.</p>
         <p className="mt-2 text-xs text-brand-dim">
           <Link to="/about" className="underline hover:text-brand-heading">
             About & school pickup
           </Link>
           {" · "}
           <a
-            href="https://www.unicef.org"
+            href="https://www.unicefusa.org"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-brand-heading"
           >
-            unicef.org
+            unicefusa.org
           </a>
         </p>
       </footer>

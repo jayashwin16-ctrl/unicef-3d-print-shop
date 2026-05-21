@@ -5,6 +5,7 @@ import PageHero from "../components/site/PageHero";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
+import SiteDisclaimer from "../components/SiteDisclaimer";
 
 /** UNICEF’s seven regional offices (where much of their field work is organized). */
 const UNICEF_REGIONS = [
@@ -32,7 +33,7 @@ export default function Home() {
             <span>Through Every Purchase</span>
           </>
         }
-        subtitle="We sell 3D-printed items and pledge a share of each sale to support children. Your purchase funds creative prints—and real impact."
+        subtitle="We sell 3D-printed items and donate a portion of proceeds to UNICEF USA. Your purchase supports creative prints and charitable giving."
       >
         <Link to="/shop" className="btn-primary">
           Shop
@@ -40,16 +41,17 @@ export default function Home() {
         <Link to="/problem" className="btn-outline">
           Learn More
         </Link>
-        <p className="mt-10 w-full text-center text-xs uppercase tracking-[0.2em] text-white/85">
-          In partnership with UNICEF-aligned giving
-        </p>
       </PageHero>
+
+      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
+        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
+      </div>
 
       <StatsBar
         stats={[
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
-          { value: "7", label: "UNICEF regional offices", tone: "dark" },
-          { value: "~50%", label: "Pledged from each sale", tone: "green" },
+          { value: "7", label: "Global regions we highlight", tone: "dark" },
+          { value: "Portion", label: "Of proceeds donated", tone: "green" },
           { value: "$10+", label: "Prints that make a difference", tone: "dark" },
         ]}
       />
@@ -65,26 +67,26 @@ export default function Home() {
           </div>
           <div className="flex-1 text-sm leading-relaxed text-[#333]">
             <p className="mb-3.5">
-              <strong className="text-brand-heading">3D Prints for Good</strong> is a 3D print shop
-              created by Jay to help every child have a fair chance. We make fidgets, figures,
-              and collectibles—and pledge a meaningful share of each sale to support children.
+              <strong className="text-brand-heading">3D Prints for Good</strong> is an independent
+              student 3D print shop created by Jay. We make fidgets, figures, and collectibles—and
+              donate a portion of proceeds to{" "}
+              <span className="font-bold text-brand-blue">UNICEF USA</span>.
             </p>
             <p>
-              We align our giving with{" "}
-              <span className="font-bold text-brand-blue">UNICEF&apos;s mission</span>: health,
-              education, and protection for children in need. Our goal is simple:{" "}
+              Our goal is simple:{" "}
               <span className="font-bold text-brand-blue-dark">
-                turn everyday purchases into help for kids.
-              </span>
+                turn everyday purchases into support for children in need.
+              </span>{" "}
+              We are not affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
             </p>
           </div>
         </div>
       </Section>
 
-      <Section title="Regions UNICEF Focuses On" alt>
+      <Section title="Regions where children need support" alt>
         <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
-          UNICEF works in more than 190 countries. Most programs are run through seven regional
-          offices around the world.
+          UNICEF USA supports programs in more than 190 countries. These seven regions reflect
+          where much of that work is organized worldwide.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           {UNICEF_REGIONS.map((r) => (

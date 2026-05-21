@@ -12,7 +12,7 @@ export default function ProductImageSlider({
 }: ProductImageSliderProps) {
   const images = product.images || (product.image ? [product.image] : []);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const gradientClass = `bg-gradient-to-br ${product.imageGradient ?? "from-unicef-blue to-unicef-dark"}`;
+  const gradientClass = `bg-gradient-to-br ${product.imageGradient ?? "from-print-from to-print-to"}`;
 
   if (images.length === 0) {
     return <div className={`${gradientClass} ${className}`} />;

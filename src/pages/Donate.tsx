@@ -1,38 +1,39 @@
 import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
+import SiteDisclaimer from "../components/SiteDisclaimer";
 
-const UNICEF_LINKS = [
+const UNICEF_USA_LINKS = [
   {
-    title: "Donate to UNICEF",
+    title: "Donate to UNICEF USA",
     description:
-      "Make a one-time or monthly gift on UNICEF’s official site. Your donation goes directly to their programs for children.",
-    href: "https://www.unicef.org/donate",
-    cta: "Donate on unicef.org",
+      "Make a one-time or monthly gift on UNICEF USA’s official site. Your donation goes directly to their programs for children.",
+    href: "https://www.unicefusa.org/help/donate",
+    cta: "Donate on unicefusa.org",
     primary: true,
   },
   {
     title: "Emergency relief",
     description:
-      "Support children in crises—conflicts, disasters, and displacement—through UNICEF’s emergency appeals.",
-    href: "https://www.unicef.org/emergencies",
+      "Support children in crises—conflicts, disasters, and displacement—through UNICEF USA’s emergency appeals.",
+    href: "https://www.unicefusa.org/emergency",
     cta: "View emergency appeals",
     primary: false,
   },
   {
     title: "Where your gift goes",
     description:
-      "Read how UNICEF uses funds for health, nutrition, education, and protection in more than 190 countries.",
-    href: "https://www.unicef.org/what-we-do",
-    cta: "Learn what UNICEF does",
+      "Read how UNICEF USA uses funds for health, nutrition, education, and protection for children worldwide.",
+    href: "https://www.unicefusa.org/about-us",
+    cta: "Learn about UNICEF USA",
     primary: false,
   },
   {
     title: "Reports & transparency",
     description:
-      "Explore UNICEF’s published data and annual reports on children worldwide.",
-    href: "https://www.unicef.org/reports",
-    cta: "Read UNICEF reports",
+      "Explore UNICEF USA’s published impact and financial reports.",
+    href: "https://www.unicefusa.org/about-us/financials",
+    cta: "Read reports",
     primary: false,
   },
 ] as const;
@@ -44,21 +45,19 @@ export default function Donate() {
         label="Give directly"
         title={
           <>
-            Donate to <span className="text-brand-blue">UNICEF</span>
+            Donate to <span className="text-brand-blue">UNICEF USA</span>
           </>
         }
-        subtitle="This page is for direct giving through UNICEF—not our 3D print shop. Use the official links below to donate securely."
+        subtitle="This page is for direct giving through UNICEF USA—not our 3D print shop. Use the official links below to donate securely."
       />
 
-      <Section title="Official UNICEF donation links">
-        <p className="mx-auto mb-8 max-w-xl text-center text-sm leading-relaxed text-[#333]">
-          <strong className="text-brand-heading">3D Prints for Good</strong> is an independent
-          student project. We are not UNICEF and cannot accept donations on their behalf. For the
-          greatest impact, give through UNICEF’s own website.
-        </p>
+      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
+        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
+      </div>
 
+      <Section title="Official UNICEF USA donation links">
         <div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2">
-          {UNICEF_LINKS.map((link) => (
+          {UNICEF_USA_LINKS.map((link) => (
             <div
               key={link.href}
               className={`flex flex-col rounded-[10px] border p-6 ${
@@ -87,9 +86,8 @@ export default function Donate() {
       <Section title="How this relates to our shop" alt>
         <div className="mx-auto max-w-xl space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            When you buy from our shop, we pledge about 50% of each sale toward children-focused
-            giving aligned with UNICEF&apos;s mission. That is separate from donating on
-            unicef.org.
+            When you buy from our shop, a portion of proceeds is donated to UNICEF USA. That is
+            separate from donating directly on unicefusa.org.
           </p>
           <p>
             <strong className="text-brand-heading">Want prints instead?</strong> Browse our shop—we

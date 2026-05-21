@@ -5,8 +5,8 @@ export default {
     extend: {
       colors: {
         brand: {
-          blue: "#1CABE2",
-          "blue-dark": "#374EA2",
+          blue: "#0ea5e9",
+          "blue-dark": "#0369a1",
           heading: "#1a2e4a",
           bg: "#f0f7fc",
           card: "#ffffff",
@@ -14,7 +14,7 @@ export default {
           muted: "#666666",
           dim: "#999999",
         },
-        unicef: { blue: "#1CABE2", dark: "#374EA2", accent: "#FFC20E" },
+        print: { from: "#0ea5e9", to: "#0f766e" },
       },
       fontFamily: {
         sans: [

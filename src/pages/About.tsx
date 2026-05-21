@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import SchoolPickupForm from "../components/SchoolPickupForm";
+import SiteDisclaimer from "../components/SiteDisclaimer";
 
 export default function About() {
   const [submitted, setSubmitted] = useState(false);
@@ -22,8 +23,12 @@ export default function About() {
             3D Prints for <span className="text-brand-blue">Good</span>
           </>
         }
-        subtitle="Student-led 3D printing with a pledge to help children through UNICEF-aligned giving."
+        subtitle="Independent student 3D printing. A portion of proceeds is donated to UNICEF USA."
       />
+
+      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
+        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
+      </div>
 
       <Section label="About this shop" title="What we do">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
@@ -33,9 +38,9 @@ export default function About() {
             students running the project.
           </p>
           <p>
-            We support giving aligned with UNICEF&apos;s mission because UNICEF is the only U.N.
-            agency dedicated exclusively to children—focused on health, education, and protection
-            worldwide.
+            We chose to donate a portion of proceeds to UNICEF USA because they focus on
+            children&apos;s health, education, and protection worldwide. That choice does not imply
+            any official partnership.
           </p>
           <p>
             We hope you enjoy our products and this website. Share feedback anytime, and tell others
@@ -50,25 +55,22 @@ export default function About() {
       <Section title="How the shop works" alt>
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            Every item in our shop is 3D-printed in durable PLA. We pledge about{" "}
-            <strong className="text-brand-heading">50% of each sale</strong> toward children-focused
-            giving aligned with UNICEF&apos;s mission—health, education, and protection for kids
-            worldwide.
+            Every item in our shop is 3D-printed in durable PLA. A portion of each sale is donated to
+            UNICEF USA to support children&apos;s health, education, and protection.
           </p>
           <p>
             You can buy online with secure checkout, pick up at school (see the form below), or
             choose shipping when you pay. Thank you for supporting this project!
           </p>
           <p>
-            <strong className="text-brand-heading">Independent initiative.</strong> This website is
-            not affiliated with or endorsed by UNICEF. For official UNICEF donations, use{" "}
+            For official donations directly to UNICEF USA, visit{" "}
             <a
-              href="https://www.unicef.org"
+              href="https://www.unicefusa.org"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-brand-blue underline"
             >
-              unicef.org
+              unicefusa.org
             </a>
             .
           </p>
