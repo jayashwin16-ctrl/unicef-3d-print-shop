@@ -108,11 +108,11 @@ function getShippingOptions(): Stripe.Checkout.SessionCreateParams.ShippingOptio
 
 function getProduct(id: string): { title: string; description?: string; price: number; currency: string; image?: string } | null {
   const products: Record<string, { title: string; description?: string; price: number; currency: string; image?: string }> = {
-    "1": { title: "3D printed egg fidget", description: "Satisfying 3D-printed egg fidget toy.", price: 10, currency: "usd", image: "/Photos/egg-fidget-2.jpg" },
-    "2": { title: "3D printed Samurai Sword", description: "Detailed 3D-printed samurai sword replica.", price: 20, currency: "usd", image: "/Photos/samurai-sword-2.jpg" },
-    "3": { title: "Articulated dragon", description: "Flexible articulated dragon figure.", price: 18, currency: "usd", image: "/Photos/articulated-dragon.jpg" },
-    "4": { title: "Shiny dragon", description: "Beautiful shiny dragon figure.", price: 28, currency: "usd", image: "/Photos/shiny-dragon.jpg" },
-    "5": { title: "Skull pass-through toy", description: "Unique 3D-printed skull with pass-through design.", price: 16, currency: "usd", image: "/Photos/skull-pass-through-2.jpg" },
+    "1": { title: "3D printed egg fidget", description: "Satisfying 3D-printed egg fidget toy.", price: 9.99, currency: "usd", image: "/Photos/egg-fidget-2.jpg" },
+    "2": { title: "3D printed Samurai Sword", description: "Detailed 3D-printed samurai sword replica.", price: 19.99, currency: "usd", image: "/Photos/samurai-sword-2.jpg" },
+    "3": { title: "Articulated dragon", description: "Flexible articulated dragon figure.", price: 17.99, currency: "usd", image: "/Photos/articulated-dragon.jpg" },
+    "4": { title: "Shiny dragon", description: "Beautiful shiny dragon figure.", price: 14.99, currency: "usd", image: "/Photos/shiny-dragon.jpg" },
+    "5": { title: "Skull pass-through toy", description: "Unique 3D-printed skull with pass-through design.", price: 14.99, currency: "usd", image: "/Photos/skull-pass-through-2.jpg" },
   };
   return products[id] ?? null;
 }
