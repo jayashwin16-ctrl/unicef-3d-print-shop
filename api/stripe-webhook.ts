@@ -95,7 +95,6 @@ async function sendThankYouEmail(params: {
   const { to, amount, sessionId, pin, meta, session } = params;
   const origin = siteOriginFromSession(session);
   const student = studentFromMeta(meta);
-  const fulfillment = meta?.fulfillment === "delivery" ? "delivery" : "pickup";
 
   const lines = [
     "Thank you for your order from 3D Prints for Good!",
@@ -120,19 +119,6 @@ async function sendThankYouEmail(params: {
     "Please save this PIN. We may ask for it at school pickup to confirm your order.",
     ""
   );
-
-  if (fulfillment === "pickup") {
-    lines.push(
-      "School pickup: If you have not already, fill out the school pickup form on our site:",
-      `${origin}/about#school-pickup`,
-      ""
-    );
-  } else {
-    lines.push(
-      "Your shipping details were collected during checkout. We will follow up if we need anything else.",
-      ""
-    );
-  }
 
   lines.push(
     "Questions? Reply to this email or visit our shop:",

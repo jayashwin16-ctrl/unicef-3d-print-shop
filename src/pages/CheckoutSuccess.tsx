@@ -17,17 +17,9 @@ export default function CheckoutSuccess() {
           </svg>
         </div>
         <h1 className="mb-2 text-2xl font-bold text-slate-900">Thank you for your order</h1>
-        <p className="mb-4 text-slate-600">
+        <p className="mb-8 text-slate-600">
           Payment was successful. A thank-you email with your order details has been sent to the
           address you used at checkout.
-        </p>
-        <p className="mb-8 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-left text-sm text-slate-600">
-          <strong className="text-sky-900">School pickup:</strong> if you pick up at school and have
-          not submitted the form yet, use the{" "}
-          <Link to="/about#school-pickup" className="font-semibold text-sky-800 underline">
-            pickup form on the About page
-          </Link>
-          . (Before paying, it is also on the Cart page next to your order.)
         </p>
         <Link
           to="/shop"
