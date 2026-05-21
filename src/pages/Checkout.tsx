@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { fetchCheckoutStatus } from "../lib/checkoutVerification";
 
 const STORAGE_KEY = "checkout_flow_v1";
+const VERIFIED_SESSION_KEY = "checkout_verified_session";
 
 export type CheckoutLocationState = {
   fromCart?: true;
@@ -39,7 +39,6 @@ export default function Checkout() {
   );
   const [step, setStep] = useState<Step>("code");
   const [verified, setVerified] = useState(false);
-  const [statusLoading, setStatusLoading] = useState(true);
   const [codeInput, setCodeInput] = useState("");
   const [student, setStudent] = useState({ name: "", grade: "", email: "" });
   const [verifying, setVerifying] = useState(false);
@@ -66,38 +65,22 @@ export default function Checkout() {
     }
   }, [source, itemCount, navigate]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const status = await fetchCheckoutStatus();
-      if (cancelled) return;
-      if (status.verified) {
-        setVerified(true);
-      }
-      setStatusLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const isCart = Boolean(source?.fromCart);
   const effectiveFulfillment = useMemo((): "pickup" | "delivery" => {
     return source?.fulfillment || source?.buyNow?.fulfillment || "pickup";
   }, [source]);
 
   useEffect(() => {
-    if (statusLoading) return;
-    if (verified) {
-      if (step === "code") {
-        setStep("student");
-      }
-      return;
-    }
-    if (POST_VERIFY_STEPS.includes(step) || step === "pay") {
+    if (!verified && (POST_VERIFY_STEPS.includes(step) || step === "pay")) {
       setStep("code");
     }
-  }, [verified, statusLoading, step]);
+  }, [verified, step]);
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem(VERIFIED_SESSION_KEY);
+    };
+  }, []);
 
   if (!source) {
     return null;
@@ -118,6 +101,7 @@ export default function Checkout() {
         throw new Error(d.error || "Invalid code");
       }
       setVerified(true);
+      sessionStorage.setItem(VERIFIED_SESSION_KEY, "1");
       setStep("student");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
@@ -181,6 +165,7 @@ export default function Checkout() {
       const msg = e instanceof Error ? e.message : "";
       if (msg.includes("code") || msg.includes("verification")) {
         setVerified(false);
+        sessionStorage.removeItem(VERIFIED_SESSION_KEY);
         setStep("code");
         setErr(msg);
       } else {
@@ -202,14 +187,6 @@ export default function Checkout() {
       return;
     }
     setStep("pay");
-  }
-
-  if (statusLoading) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-10">
-        <p className="text-slate-600">Checking verification…</p>
-      </div>
-    );
   }
 
   return (

@@ -130,6 +130,7 @@ export default function Cart() {
                       onClick={() => {
                         setError(null);
                         if (itemCount === 0) return;
+                        sessionStorage.removeItem("checkout_verified_session");
                         navigate("/checkout", { state: { fromCart: true, fulfillment: "pickup" } });
                       }}
                       className="px-6 py-2.5 rounded-full bg-brand-blue text-white font-semibold hover:bg-brand-blue-dark transition"

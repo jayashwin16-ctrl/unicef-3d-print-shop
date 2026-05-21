@@ -58,6 +58,7 @@ export default function ProductDetail() {
   const handleBuyNow = () => {
     if (!product) return;
     setError(null);
+    sessionStorage.removeItem("checkout_verified_session");
     navigate("/checkout", { state: { buyNow: { productId: product.id, quantity: 1 } } });
   };
 
