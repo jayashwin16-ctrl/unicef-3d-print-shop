@@ -9,43 +9,46 @@ type PageHeroProps = {
 };
 
 export default function PageHero({ label, title, subtitle, image, children }: PageHeroProps) {
+  if (image) {
+    return (
+      <section className="relative isolate overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/Photos/home-bg.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-ink/75 via-brand-ink/60 to-brand-ink/85" />
+        <div className="absolute inset-0 bg-mesh-hero opacity-90" />
+        <div className="relative z-10 mx-auto max-w-site px-6 py-24 text-center md:py-32">
+          <p className="animate-fade-up text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-300/90">
+            {label}
+          </p>
+          <h1 className="animate-fade-up mt-4 text-4xl font-extrabold tracking-tight text-white md:text-display-lg [&_span]:text-gradient">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="animate-fade-up mx-auto mt-6 max-w-prose text-base leading-relaxed text-slate-200 md:text-lg">
+              {subtitle}
+            </p>
+          )}
+          {children && (
+            <div className="animate-fade-up mt-10 flex flex-wrap justify-center gap-4">{children}</div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section
-      className={
-        image
-          ? "relative bg-cover bg-center px-8 py-20 text-center md:py-24"
-          : "bg-gradient-to-br from-[#e3f2fd] via-[#f0f7fc] to-[#e3f2fd] px-8 py-16 text-center md:py-20"
-      }
-      style={
-        image
-          ? {
-              backgroundImage:
-                "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/Photos/home-bg.jpg')",
-            }
-          : undefined
-      }
-    >
-      <div className={image ? "relative z-10" : ""}>
-        <div className={`section-label ${image ? "!text-white/90" : ""}`}>{label}</div>
-        <h1
-          className={`text-3xl font-bold leading-tight md:text-[32px] ${
-            image
-              ? "text-white [&_span]:text-[#7ec8f0]"
-              : "text-brand-heading [&_span]:text-brand-blue"
-          }`}
-        >
+    <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg bg-mesh-hero">
+      <div className="mx-auto max-w-site px-6 py-16 text-center md:py-20">
+        <p className="section-label">{label}</p>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-heading md:text-display [&_span]:text-gradient">
           {title}
         </h1>
         {subtitle && (
-          <p
-            className={`mx-auto mt-4 max-w-lg text-sm leading-relaxed ${
-              image ? "text-white/85" : "text-brand-muted"
-            }`}
-          >
-            {subtitle}
-          </p>
+          <p className="mx-auto mt-5 max-w-prose text-base leading-relaxed text-brand-muted">{subtitle}</p>
         )}
-        {children && <div className="mt-7 flex flex-wrap justify-center gap-3">{children}</div>}
+        {children && <div className="mt-8 flex flex-wrap justify-center gap-3">{children}</div>}
       </div>
     </section>
   );

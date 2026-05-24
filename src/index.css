@@ -2,28 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply antialiased font-sans text-[#333] bg-brand-bg;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-surface font-sans text-slate-700 antialiased;
+  }
+
+  ::selection {
+    @apply bg-cyan-200/80 text-brand-ink;
+  }
 }
 
 @layer components {
   .section-label {
-    @apply text-center text-[11px] uppercase tracking-[0.2em] text-brand-blue-dark mb-2;
+    @apply mb-3 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-brand-accent;
   }
 
   .section-title {
-    @apply text-center text-[22px] font-bold text-brand-heading mb-6;
+    @apply mb-10 text-center text-2xl font-extrabold tracking-tight text-brand-heading md:text-3xl;
   }
 
   .btn-primary {
-    @apply inline-block rounded-md bg-brand-blue px-7 py-3 text-sm font-bold text-white transition hover:opacity-90;
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600 px-8 py-3.5 text-sm font-bold text-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover;
   }
 
   .btn-outline {
-    @apply inline-block rounded-md border border-white/90 bg-white/90 px-7 py-3 text-sm font-bold text-brand-heading transition hover:opacity-90;
+    @apply inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-8 py-3.5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20;
   }
 
   .btn-yellow {
-    @apply inline-block rounded-md bg-brand-blue-dark px-10 py-4 text-base font-bold text-white transition hover:opacity-90;
+    @apply inline-flex items-center justify-center rounded-full bg-white px-10 py-4 text-base font-bold text-cyan-800 shadow-soft transition hover:-translate-y-0.5;
+  }
+
+  .card-premium {
+    @apply overflow-hidden rounded-2xl border border-brand-border/80 bg-brand-card shadow-card transition duration-300 hover:-translate-y-1 hover:border-cyan-200/80 hover:shadow-card-hover;
+  }
+
+  .glass-nav {
+    @apply border-b border-white/60 bg-white/80 shadow-nav backdrop-blur-xl;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-cyan-500 to-teal-600 bg-clip-text text-transparent;
+  }
+
+  .pill-active {
+    @apply bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-soft;
+  }
+
+  .pill-inactive {
+    @apply border border-brand-border bg-brand-card text-brand-muted transition hover:border-cyan-200 hover:text-brand-heading;
   }
 }
