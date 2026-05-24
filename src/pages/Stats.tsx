@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
+import { UNICEF_REGIONS_OVERVIEW } from "../config/siteNav";
 
 const REGION_FACTS = [
   {
@@ -80,6 +81,24 @@ export default function Stats() {
         }
         subtitle="UNICEF organizes much of its work through seven regional offices worldwide. Here is what children face in those focus areas."
       />
+
+      <Section title="Seven global regions" alt>
+        <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
+          UNICEF USA supports programs in more than 190 countries. Much of that work is organized
+          through seven regional offices.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {UNICEF_REGIONS_OVERVIEW.map((r) => (
+            <div
+              key={r.name}
+              className="w-[140px] rounded-lg border border-brand-border bg-brand-bg px-3 py-5 text-center"
+            >
+              <div className="text-[28px]">{r.icon}</div>
+              <div className="mt-1.5 text-xs font-bold leading-snug text-[#333]">{r.name}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       <Section title="Facts by UNICEF focus region">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

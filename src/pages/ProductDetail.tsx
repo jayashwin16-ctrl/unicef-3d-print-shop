@@ -144,8 +144,10 @@ export default function ProductDetail() {
               Buy now
             </button>
           </div>
+        </div>
+      </div>
 
-          <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900">Leave a 5‑star review</h2>
             <p className="mt-1 text-sm text-slate-600">Tap the stars, then submit your review.</p>
 
@@ -225,8 +227,6 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
       </div>
     </div>
   );

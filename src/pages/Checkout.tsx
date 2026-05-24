@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import SchoolPickupForm, { type PickupDetails } from "../components/SchoolPickupForm";
+import CheckoutStepBar from "../components/CheckoutStepBar";
 
 const STORAGE_KEY = "checkout_flow_v1";
 const VERIFIED_SESSION_KEY = "checkout_verified_session";
@@ -188,6 +189,7 @@ export default function Checkout() {
   return (
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
+      <CheckoutStepBar current={step} />
       <p className="text-sm text-slate-600 mb-4">
         Enter the checkout code, then school pickup details, to pay.
       </p>

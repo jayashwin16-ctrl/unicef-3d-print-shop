@@ -37,20 +37,20 @@ export default function SchoolPickupForm({
   return (
     <section
       id={sectionId}
-      className={`rounded-2xl border border-sky-300 bg-sky-50 p-6 shadow-sm ${sectionId ? "scroll-mt-24" : ""} ${className}`.trim()}
+      className={`rounded-2xl border border-cyan-200/80 bg-gradient-to-br from-cyan-50/80 to-white p-6 shadow-card ${sectionId ? "scroll-mt-24" : ""} ${className}`.trim()}
     >
-      <h2 className="text-xl font-bold text-sky-900 md:text-2xl">School pickup</h2>
-      <p className="mt-2 text-sm text-sky-800">
+      <h2 className="text-xl font-bold text-brand-heading md:text-2xl">School pickup</h2>
+      <p className="mt-2 text-sm text-brand-muted">
         Full name, grade, and email (used for your receipt and school pickup).
       </p>
       {pickupSubmitted ? (
-        <p className="mt-4 rounded-lg bg-sky-200 px-3 py-2 text-sm font-medium text-sky-900">
+        <p className="mt-4 rounded-lg bg-cyan-100 px-3 py-2 text-sm font-medium text-cyan-900">
           Thanks! Your details were saved — continue to payment below.
         </p>
       ) : (
         <form className="mt-5 space-y-4" onSubmit={handlePickupSubmit}>
           <div>
-            <label htmlFor={`pickupName${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
+            <label htmlFor={`pickupName${suf}`} className="mb-1 block text-sm font-semibold text-brand-heading">
               Full name
             </label>
             <input
@@ -58,12 +58,12 @@ export default function SchoolPickupForm({
               name="pickupName"
               type="text"
               required
-              className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
+              className="w-full rounded-xl border border-brand-border bg-white px-3 py-2.5 text-slate-800 outline-none ring-cyan-400 focus:ring-2"
               placeholder="Student name"
             />
           </div>
           <div>
-            <label htmlFor={`pickupGrade${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
+            <label htmlFor={`pickupGrade${suf}`} className="mb-1 block text-sm font-semibold text-brand-heading">
               Grade
             </label>
             <input
@@ -71,12 +71,12 @@ export default function SchoolPickupForm({
               name="pickupGrade"
               type="text"
               required
-              className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
+              className="w-full rounded-xl border border-brand-border bg-white px-3 py-2.5 text-slate-800 outline-none ring-cyan-400 focus:ring-2"
               placeholder="e.g. 7th"
             />
           </div>
           <div>
-            <label htmlFor={`pickupEmail${suf}`} className="mb-1 block text-sm font-semibold text-sky-900">
+            <label htmlFor={`pickupEmail${suf}`} className="mb-1 block text-sm font-semibold text-brand-heading">
               Email (for receipt)
             </label>
             <input
@@ -84,14 +84,11 @@ export default function SchoolPickupForm({
               name="pickupEmail"
               type="email"
               required
-              className="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-400 focus:ring-2"
-              placeholder="parent@example.com"
+              className="w-full rounded-xl border border-brand-border bg-white px-3 py-2.5 text-slate-800 outline-none ring-cyan-400 focus:ring-2"
+              placeholder="you@example.com"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full rounded-full bg-brand-blue px-6 py-2.5 font-semibold text-white transition hover:bg-brand-blue-dark"
-          >
+          <button type="submit" className="btn-primary w-full">
             Continue to payment
           </button>
         </form>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import SiteDisclaimer from "../components/SiteDisclaimer";
+import { LEARN_LINKS } from "../config/siteNav";
 
 export default function About() {
   const [submitted, setSubmitted] = useState(false);
@@ -16,71 +17,58 @@ export default function About() {
   return (
     <>
       <PageHero
-        label="About"
+        label="About the project"
         title={
           <>
-            3D Prints for <span className="text-brand-blue">Good</span>
+            Meet <span className="text-brand-blue">Jay</span>
           </>
         }
-        subtitle="Independent student 3D printing. A portion of proceeds is donated to UNICEF USA."
+        subtitle="3D Prints for Good is an independent student shop—60% of proceeds goes to UNICEF USA."
       />
 
-      <div className="border-b border-brand-border bg-brand-card px-6 py-4">
-        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
-      </div>
-
-      <Section label="About this shop" title="What we do">
+      <Section label="Who runs this shop" title="About Jay">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
           <p>
-            This shop sells 3D-printed items and donates part of the proceeds to support children.
-            We like 3D printing because it is creative and rewarding without being out of reach for
-            students running the project.
+            <strong className="text-brand-heading">Jay</strong> is a 10 year old builder who runs this
+            3D print shop with parent supervision. Jay designs and prints fidgets, figures, and
+            collectibles in PLA plastic.
           </p>
           <p>
-            We chose to donate a portion of proceeds to UNICEF USA because they focus on
-            children&apos;s health, education, and protection worldwide. That choice does not imply
-            any official partnership.
+            60% of proceeds from every purchase is donated to UNICEF USA. This project is not
+            affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
           </p>
           <p>
-            We hope you enjoy our products and this website. Share feedback anytime, and tell others
-            about 3D Prints for Good. Happy shopping!
-          </p>
-          <p className="text-brand-muted">
-            This project was created by Jay.
+            <Link to="/how-it-works" className="font-semibold text-brand-blue hover:underline">
+              How to buy from the shop →
+            </Link>
           </p>
         </div>
       </Section>
 
-      <Section title="How the shop works" alt>
-        <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
-          <p>
-            Every item in our shop is 3D-printed in durable PLA. We donate 60% of proceeds from every
-            purchase to UNICEF USA to support children&apos;s health, education, and protection.
-          </p>
-          <p>
-            You can buy online with secure checkout and pick up at school. School pickup details are
-            collected on the checkout page. Thank you for supporting this project!
-          </p>
-          <p>
-            For official donations directly to UNICEF USA, visit{" "}
-            <a
-              href="https://www.unicefusa.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-brand-blue underline"
-            >
-              unicefusa.org
-            </a>
-            .
-          </p>
-        </div>
+      <Section title="Learn why this matters" alt>
+        <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
+          These pages explain the problem, the data, and why we chose UNICEF USA—not our shop rules.
+        </p>
+        <ul className="mx-auto grid max-w-md gap-2 text-sm">
+          {LEARN_LINKS.map(({ path, label }) => (
+            <li key={path}>
+              <Link
+                to={path}
+                className="flex items-center justify-between rounded-lg border border-brand-border bg-brand-card px-4 py-3 font-medium text-brand-heading hover:border-brand-blue"
+              >
+                {label}
+                <span className="text-brand-blue">→</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Section>
 
-      <Section alt>
+      <Section>
         <div className="mx-auto max-w-lg rounded-[10px] border border-orange-200 bg-orange-50 p-6">
-          <h2 className="text-xl font-bold text-orange-900">Feedback form</h2>
+          <h2 className="text-xl font-bold text-orange-900">Feedback</h2>
           <p className="mt-2 text-sm text-orange-800">
-            Tell us what you like and what we should improve.
+            Tell Jay what you like and what we should improve.
           </p>
           {submitted && (
             <p className="mt-4 rounded-lg bg-orange-200 px-3 py-2 text-sm font-medium text-orange-900">
@@ -89,10 +77,7 @@ export default function About() {
           )}
           <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="feedbackName"
-                className="mb-1 block text-sm font-semibold text-orange-900"
-              >
+              <label htmlFor="feedbackName" className="mb-1 block text-sm font-semibold text-orange-900">
                 Name
               </label>
               <input
@@ -105,10 +90,7 @@ export default function About() {
               />
             </div>
             <div>
-              <label
-                htmlFor="feedbackEmail"
-                className="mb-1 block text-sm font-semibold text-orange-900"
-              >
+              <label htmlFor="feedbackEmail" className="mb-1 block text-sm font-semibold text-orange-900">
                 Email
               </label>
               <input
@@ -121,11 +103,8 @@ export default function About() {
               />
             </div>
             <div>
-              <label
-                htmlFor="feedbackMessage"
-                className="mb-1 block text-sm font-semibold text-orange-900"
-              >
-                Feedback
+              <label htmlFor="feedbackMessage" className="mb-1 block text-sm font-semibold text-orange-900">
+                Message
               </label>
               <textarea
                 id="feedbackMessage"
@@ -150,6 +129,10 @@ export default function About() {
           </Link>
         </p>
       </Section>
+
+      <div className="border-t border-brand-border bg-brand-card px-6 py-6">
+        <SiteDisclaimer variant="banner" className="mx-auto max-w-3xl" />
+      </div>
     </>
   );
 }

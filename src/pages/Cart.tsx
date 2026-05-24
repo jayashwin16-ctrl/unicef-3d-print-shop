@@ -93,9 +93,13 @@ export default function Cart() {
           {rows}
         </div>
         <div className="p-4 bg-slate-50 border-t border-slate-200">
-          <p className="text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2 mb-4">
-            Checkout requires a <strong>5-digit code</strong> from the shop. School pickup details
-            are collected on the checkout page.
+          <p className="text-sm text-amber-800 bg-amber-50 rounded-lg px-3 py-2 mb-2">
+            Checkout requires a <strong>5-digit code</strong> from the shop.
+          </p>
+          <p className="text-sm text-slate-600 mb-4">
+            <Link to="/how-it-works" className="font-semibold text-brand-blue hover:underline">
+              How checkout works →
+            </Link>
           </p>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="text-lg font-bold text-slate-900">

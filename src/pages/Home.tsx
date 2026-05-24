@@ -5,17 +5,7 @@ import PageHero from "../components/site/PageHero";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
-
-/** UNICEF’s seven regional offices (where much of their field work is organized). */
-const UNICEF_REGIONS = [
-  { icon: "🌏", name: "East Asia & Pacific" },
-  { icon: "🌍", name: "Eastern & Southern Africa" },
-  { icon: "🏔️", name: "Europe & Central Asia" },
-  { icon: "🌎", name: "Latin America & Caribbean" },
-  { icon: "🕌", name: "Middle East & North Africa" },
-  { icon: "🪷", name: "South Asia" },
-  { icon: "🌍", name: "West & Central Africa" },
-];
+import ExploreCards from "../components/site/ExploreCards";
 
 export default function Home() {
   const featured = products.slice(0, 3);
@@ -37,19 +27,23 @@ export default function Home() {
         <Link to="/shop" className="btn-primary">
           Shop
         </Link>
-        <Link to="/problem" className="btn-outline">
-          Learn More
+        <Link to="/how-it-works" className="btn-outline">
+          How it works
         </Link>
       </PageHero>
 
       <StatsBar
         stats={[
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
-          { value: "7", label: "Global regions we highlight", tone: "dark" },
           { value: "60%", label: "Of proceeds donated", tone: "green" },
-          { value: "$10+", label: "Prints that make a difference", tone: "dark" },
+          { value: "5", label: "Prints in our shop", tone: "dark" },
+          { value: "$9.99+", label: "Starting price", tone: "dark" },
         ]}
       />
+
+      <Section label="Start here" title="Explore">
+        <ExploreCards />
+      </Section>
 
       <Section label="Our Mission" title="What We Do">
         <div className="mx-auto flex max-w-[700px] flex-col items-center gap-6 md:flex-row">
@@ -76,24 +70,6 @@ export default function Home() {
               The site is not affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
             </p>
           </div>
-        </div>
-      </Section>
-
-      <Section title="Regions where children need support" alt>
-        <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
-          UNICEF USA supports programs in more than 190 countries. These seven regions reflect
-          where much of that work is organized worldwide.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          {UNICEF_REGIONS.map((r) => (
-            <div
-              key={r.name}
-              className="w-[140px] rounded-lg border border-brand-border bg-brand-bg px-3 py-5 text-center transition hover:-translate-y-1 hover:border-brand-blue"
-            >
-              <div className="text-[28px]">{r.icon}</div>
-              <div className="mt-1.5 text-xs font-bold leading-snug text-[#333]">{r.name}</div>
-            </div>
-          ))}
         </div>
       </Section>
 
@@ -133,9 +109,9 @@ export default function Home() {
 
       <CtaBanner
         title="Ready to Make a Difference?"
-        text="Shop our prints or learn how your purchase supports children."
-        buttonLabel="Shop Now"
-        to="/shop"
+        text="See how to buy, or browse the shop."
+        buttonLabel="How it works"
+        to="/how-it-works"
       />
     </>
   );
