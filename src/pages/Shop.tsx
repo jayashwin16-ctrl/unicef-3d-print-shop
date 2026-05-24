@@ -4,6 +4,7 @@ import { products } from "../data/products";
 import ProductImage from "../components/ProductImage";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
+import PlainEnglish from "../components/site/PlainEnglish";
 
 const CATEGORIES = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
 
@@ -29,6 +30,16 @@ export default function Shop() {
       />
 
       <Section>
+        <PlainEnglish className="mx-auto mb-8 max-w-2xl">
+          <p>
+            Pick a print, add it to your cart, then go to checkout. You will need the{" "}
+            <strong>5-digit code</strong> from Jay&apos;s shop before you can pay.{" "}
+            <Link to="/how-it-works" className="font-bold text-cyan-700 underline">
+              See how it works
+            </Link>
+            .
+          </p>
+        </PlainEnglish>
         <div className="mx-auto mb-8 flex max-w-3xl flex-wrap justify-center gap-2">
           {CATEGORIES.map((cat) => (
             <button

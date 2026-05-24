@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Section from "../components/site/Section";
 import BarrierRow from "../components/site/BarrierRow";
 import CtaBanner from "../components/site/CtaBanner";
+import PlainEnglish from "../components/site/PlainEnglish";
 
 export default function Problem() {
   return (
@@ -16,6 +17,15 @@ export default function Problem() {
           — A 10-year-old girl in rural Pakistan, via UNICEF field report
         </p>
       </section>
+
+      <Section>
+        <PlainEnglish className="mx-auto max-w-2xl">
+          <p>
+            Around the world, many children cannot go to school, get enough food, or stay safe. This
+            page explains the main reasons—not with hard jargon, but with real barriers families face.
+          </p>
+        </PlainEnglish>
+      </Section>
 
       <Section title="Barriers Children Face">
         <BarrierRow

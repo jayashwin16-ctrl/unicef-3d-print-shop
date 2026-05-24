@@ -1,6 +1,7 @@
 /** Shared site navigation — keep labels and paths in one place. */
 
 export const LEARN_LINKS = [
+  { path: "/learn", label: "Learn overview" },
   { path: "/problem", label: "The problem" },
   { path: "/stats", label: "Stats & data" },
   { path: "/why", label: "Why we give" },
@@ -15,6 +16,7 @@ export const SHOP_LINKS = [
 export const PROJECT_LINKS = [
   { path: "/about", label: "About" },
   { path: "/how-it-works", label: "How it works" },
+  { path: "/faq", label: "Q&A" },
 ] as const;
 
 export const UNICEF_REGIONS_OVERVIEW = [

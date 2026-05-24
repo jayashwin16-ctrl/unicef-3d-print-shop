@@ -2,6 +2,9 @@ import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import SiteDisclaimer from "./SiteDisclaimer";
+import HelpStrip from "./site/HelpStrip";
+import Breadcrumbs from "./site/Breadcrumbs";
+import LearnSidebar, { isLearnAreaPath, LearnMobileNav } from "./site/LearnSidebar";
 import { LEARN_LINKS, PROJECT_LINKS, SHOP_LINKS } from "../config/siteNav";
 
 function NavLink({
@@ -63,6 +66,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       : loc.pathname === path || loc.pathname.startsWith(`${path}/`);
 
   const shopActive = loc.pathname === "/shop" || loc.pathname.startsWith("/product");
+  const learnArea = isLearnAreaPath(loc.pathname);
+  const showCrumbs = loc.pathname !== "/";
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
@@ -151,7 +156,28 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <HelpStrip />
+
+      <main className="flex-1">
+        {showCrumbs && !learnArea && (
+          <div className="mx-auto max-w-6xl px-4 pt-4 md:px-8">
+            <Breadcrumbs />
+          </div>
+        )}
+
+        {learnArea ? (
+          <div className="mx-auto max-w-6xl px-4 pb-10 md:px-8">
+            {showCrumbs && <Breadcrumbs />}
+            <LearnMobileNav />
+            <div className="flex gap-8 lg:gap-10">
+              <LearnSidebar />
+              <div className="min-w-0 flex-1">{children}</div>
+            </div>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
 
       <footer className="border-t border-brand-border bg-brand-card px-6 py-8">
         <div className="mx-auto grid max-w-4xl gap-8 text-sm md:grid-cols-3">
@@ -185,6 +211,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link to="/faq" className="hover:text-brand-heading hover:underline">
+                  Q&A
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

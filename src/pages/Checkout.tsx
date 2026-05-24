@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import SchoolPickupForm, { type PickupDetails } from "../components/SchoolPickupForm";
 import CheckoutStepBar from "../components/CheckoutStepBar";
+import PlainEnglish from "../components/site/PlainEnglish";
 
 const STORAGE_KEY = "checkout_flow_v1";
 const VERIFIED_SESSION_KEY = "checkout_verified_session";
@@ -190,9 +191,12 @@ export default function Checkout() {
     <div className="max-w-lg mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Checkout</h1>
       <CheckoutStepBar current={step} />
-      <p className="text-sm text-slate-600 mb-4">
-        Enter the checkout code, then school pickup details, to pay.
-      </p>
+      <PlainEnglish className="mb-4">
+        <p>
+          <strong>Three steps:</strong> (1) Enter the 5-digit code from Jay&apos;s shop. (2) Tell us
+          your name, grade, and email for the receipt. (3) Pay safely on Stripe—then pick up at school.
+        </p>
+      </PlainEnglish>
       {verified ? (
         <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
           Code accepted — complete school pickup below.
