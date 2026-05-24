@@ -10,7 +10,7 @@ import { LEARN_LINKS, PROJECT_LINKS, SHOP_LINKS } from "../config/siteNav";
 
 const SITE_MAP = [
   { group: "Shop", links: SHOP_LINKS },
-  { group: "Learn", links: [...LEARN_LINKS, { path: "/faq", label: "Q&A" }] },
+  { group: "Learn", links: [...LEARN_LINKS, { path: "/faq", label: "Q&A" }, { path: "/tools", label: "Tools" }] },
   { group: "Project", links: PROJECT_LINKS },
 ] as const;
 
@@ -58,7 +58,23 @@ export default function Home() {
         </PlainEnglish>
       </Section>
 
-      <Section label="Choose your path" title="What do you want to do?" alt>
+      <Section label="Power features" title="Advanced tools (still easy to use)" alt>
+        <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { title: "⌘K Search", desc: "Find any page, product, or FAQ instantly", to: "/tools" },
+            { title: "Dark mode", desc: "Open Preferences (gear icon) in the header", to: "/tools" },
+            { title: "Impact calculator", desc: "See how much goes to UNICEF USA per purchase", to: "/tools" },
+            { title: "Glossary", desc: "Every hard word explained in plain English", to: "/glossary" },
+          ].map((f) => (
+            <Link key={f.title} to={f.to} className="card-premium block p-4 !translate-y-0 hover:!shadow-card">
+              <h3 className="font-bold text-brand-heading dark:text-white">{f.title}</h3>
+              <p className="mt-1 text-xs text-brand-muted">{f.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </Section>
+
+      <Section label="Choose your path" title="What do you want to do?">
         <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-3">
           <Link to="/how-it-works" className="card-premium block p-6">
             <span className="text-2xl">🛒</span>
@@ -103,6 +119,7 @@ export default function Home() {
               <span className="font-bold text-brand-accent">UNICEF USA</span>.
             </p>
             <p>
+              Jay&apos;s goal is simple: turn everyday purchases into support for children in need.
               The site is not affiliated with, sponsored by, or endorsed by UNICEF or UNICEF USA.
             </p>
           </div>

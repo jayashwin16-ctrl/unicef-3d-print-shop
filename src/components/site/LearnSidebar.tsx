@@ -7,6 +7,8 @@ const LINKS = [
   { path: "/why", label: "Why we give", desc: "Why UNICEF USA" },
   { path: "/donate", label: "Give to UNICEF USA", desc: "Donate directly" },
   { path: "/faq", label: "Q&A", desc: "Common questions" },
+  { path: "/glossary", label: "Glossary", desc: "Words explained" },
+  { path: "/tools", label: "Tools", desc: "Calculators" },
 ] as const;
 
 export default function LearnSidebar() {
@@ -43,7 +45,7 @@ export default function LearnSidebar() {
 }
 
 export function isLearnAreaPath(pathname: string): boolean {
-  return ["/learn", "/problem", "/stats", "/why", "/donate", "/faq"].some(
+  return ["/learn", "/problem", "/stats", "/why", "/donate", "/faq", "/glossary", "/tools"].some(
     (p) => pathname === p || pathname.startsWith(`${p}/`)
   );
 }

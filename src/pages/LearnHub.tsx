@@ -34,6 +34,18 @@ const TOPICS = [
     simple: "Checkout code, pickup, payments, and donations—answered in plain language.",
     time: "4 min read",
   },
+  {
+    path: "/glossary",
+    title: "Glossary",
+    simple: "Hard words like PLA, Stripe, and proceeds—defined for everyone.",
+    time: "3 min read",
+  },
+  {
+    path: "/tools",
+    title: "Tools & calculators",
+    simple: "Donation impact calculator, search, and keyboard shortcuts.",
+    time: "2 min read",
+  },
 ] as const;
 
 const AUDIENCES = [

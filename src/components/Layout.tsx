@@ -5,6 +5,7 @@ import SiteDisclaimer from "./SiteDisclaimer";
 import HelpStrip from "./site/HelpStrip";
 import Breadcrumbs from "./site/Breadcrumbs";
 import LearnSidebar, { isLearnAreaPath, LearnMobileNav } from "./site/LearnSidebar";
+import { SiteHeaderTools } from "./advanced/SiteShell";
 import { LEARN_LINKS, PROJECT_LINKS, SHOP_LINKS } from "../config/siteNav";
 
 function NavLink({
@@ -71,25 +72,18 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
-      <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-card px-4 py-3.5 md:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <Link to="/" className="shrink-0 text-[17px] font-bold text-brand-blue" onClick={close}>
+      <header className="glass-nav sticky top-0 z-50 px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <Link to="/" className="shrink-0 text-[17px] font-bold text-brand-blue dark:text-cyan-400" onClick={close}>
             3D Prints for Good
           </Link>
-          <button
-            type="button"
-            className="text-2xl text-brand-heading md:hidden"
-            aria-label="Toggle menu"
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            ☰
-          </button>
 
-          <nav
-            className={`${
-              menuOpen ? "flex" : "hidden"
-            } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card px-6 py-5 text-sm md:static md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:p-0`}
-          >
+          <div className="flex items-center gap-2 md:gap-4">
+            <nav
+              className={`${
+                menuOpen ? "flex" : "hidden"
+              } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card/95 px-6 py-5 text-sm backdrop-blur-xl md:static md:flex md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:bg-transparent md:p-0 dark:border-slate-700 dark:bg-slate-900/95 md:dark:bg-transparent`}
+            >
             <NavGroup title="Shop">
               {SHOP_LINKS.map(({ path, label }) => (
                 <li key={path}>
@@ -152,7 +146,18 @@ export default function Layout({ children }: { children: ReactNode }) {
                 Home
               </Link>
             </div>
-          </nav>
+            </nav>
+
+            <SiteHeaderTools />
+            <button
+              type="button"
+              className="text-2xl text-brand-heading md:hidden dark:text-slate-100"
+              aria-label="Toggle menu"
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              ☰
+            </button>
+          </div>
         </div>
       </header>
 

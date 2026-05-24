@@ -16,6 +16,8 @@ const LABELS: Record<string, string> = {
   "/why": "Why we give",
   "/donate": "Give to UNICEF USA",
   "/faq": "Questions & answers",
+  "/tools": "Tools & calculators",
+  "/glossary": "Glossary",
   "/product": "Product",
 };
 
@@ -30,7 +32,7 @@ function crumbsFor(pathname: string): { to: string; label: string }[] {
     return items;
   }
 
-  if (["/problem", "/stats", "/why", "/donate", "/faq"].includes(pathname)) {
+  if (["/problem", "/stats", "/why", "/donate", "/faq", "/glossary", "/tools"].includes(pathname)) {
     items.push({ to: "/learn", label: "Learn" });
   }
 

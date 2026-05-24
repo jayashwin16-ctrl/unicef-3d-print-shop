@@ -11,6 +11,54 @@
     @apply bg-brand-surface font-sans text-slate-700 antialiased;
   }
 
+  html.dark body {
+    @apply bg-slate-950 text-slate-300;
+  }
+
+  html.text-large {
+    font-size: 112.5%;
+  }
+
+  html.compact-ui header {
+    @apply py-2;
+  }
+
+  html.reduce-motion *,
+  html.reduce-motion *::before,
+  html.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html.dark .bg-brand-bg {
+    @apply bg-slate-950;
+  }
+
+  html.dark .bg-brand-card {
+    @apply bg-slate-800 text-slate-200;
+  }
+
+  html.dark .bg-brand-surface {
+    @apply bg-slate-950;
+  }
+
+  html.dark .text-brand-heading {
+    @apply text-slate-100;
+  }
+
+  html.dark .text-brand-muted {
+    @apply text-slate-400;
+  }
+
+  html.dark .border-brand-border {
+    @apply border-slate-600;
+  }
+
+  html.dark .section-title {
+    @apply text-slate-100;
+  }
+
   ::selection {
     @apply bg-cyan-200/80 text-brand-ink;
   }
