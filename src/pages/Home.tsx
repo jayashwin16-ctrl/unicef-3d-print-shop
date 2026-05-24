@@ -6,6 +6,7 @@ import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
 import PlainEnglish from "../components/site/PlainEnglish";
+import TotalRaisedSign from "../components/site/TotalRaisedSign";
 import { LEARN_LINKS, PROJECT_LINKS, SHOP_LINKS } from "../config/siteNav";
 
 const SITE_MAP = [
@@ -38,6 +39,10 @@ export default function Home() {
           Learn (start here)
         </Link>
       </PageHero>
+
+      <section className="border-b border-brand-border/80 bg-brand-bg px-4 py-10 dark:border-slate-700 dark:bg-slate-950">
+        <TotalRaisedSign size="large" />
+      </section>
 
       <StatsBar
         stats={[

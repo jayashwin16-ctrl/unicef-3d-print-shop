@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import SiteDisclaimer from "../components/SiteDisclaimer";
+import TotalRaisedSign from "../components/site/TotalRaisedSign";
 import { LEARN_LINKS } from "../config/siteNav";
 
 export default function About() {
@@ -25,6 +26,10 @@ export default function About() {
         }
         subtitle="3D Prints for Good is an independent student shop—60% of proceeds goes to UNICEF USA."
       />
+
+      <Section>
+        <TotalRaisedSign />
+      </Section>
 
       <Section label="Who runs this shop" title="About Jay">
         <div className="mx-auto max-w-[700px] space-y-4 text-sm leading-relaxed text-[#333]">
