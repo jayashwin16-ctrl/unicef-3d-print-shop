@@ -77,3 +77,12 @@ export const products: Product[] = [
 export function getProduct(id: string): Product | undefined {
   return products.find((p) => p.id === id);
 }
+
+/** Jay's favorite print — featured in the site attention grabber. */
+export const FAVORITE_PRODUCT_ID = "2";
+
+export function getFavoriteProduct(): Product {
+  const p = getProduct(FAVORITE_PRODUCT_ID);
+  if (!p) throw new Error("Favorite product not found");
+  return p;
+}

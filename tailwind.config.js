@@ -45,11 +45,26 @@ export default {
       },
       animation: {
         "fade-up": "fadeUp 0.6s ease-out forwards",
+        "pulse-slow": "pulseSlow 4s ease-in-out infinite",
+        "bounce-subtle": "bounceSubtle 2s ease-in-out infinite",
+        "glow-ring": "glowRing 3s ease-in-out infinite",
       },
       keyframes: {
         fadeUp: {
           "0%": { opacity: "0", transform: "translateY(12px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        pulseSlow: {
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(1.05)" },
+        },
+        bounceSubtle: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-4px)" },
+        },
+        glowRing: {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
         },
       },
     },
