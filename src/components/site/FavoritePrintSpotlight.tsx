@@ -1,55 +1,89 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { FAVORITE_PRODUCT_ID, products } from "../../data/products";
-import ProductCarousel3D from "./ProductCarousel3D";
+import ProductImage from "../ProductImage";
 
 const CAROUSEL_PRODUCTS = [
   products.find((p) => p.id === FAVORITE_PRODUCT_ID)!,
   ...products.filter((p) => p.id !== FAVORITE_PRODUCT_ID),
 ];
 
-const AUTO_MS = 4500;
-
 export default function FavoritePrintSpotlight() {
   const [index, setIndex] = useState(0);
+  const product = CAROUSEL_PRODUCTS[index];
+  const isFavorite = product.id === FAVORITE_PRODUCT_ID;
+  const count = CAROUSEL_PRODUCTS.length;
 
-  const go = useCallback(
-    (delta: number) => {
-      setIndex((i) => (i + delta + CAROUSEL_PRODUCTS.length) % CAROUSEL_PRODUCTS.length);
-    },
-    []
-  );
-
-  useEffect(() => {
-    const reduced = document.documentElement.classList.contains("reduce-motion");
-    if (reduced) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mq.matches) return;
-    const id = window.setInterval(() => go(1), AUTO_MS);
-    return () => clearInterval(id);
-  }, [go]);
+  const prev = () => setIndex((i) => (i - 1 + count) % count);
+  const next = () => setIndex((i) => (i + 1) % count);
 
   return (
     <section
-      className="relative overflow-x-hidden border-y border-cyan-200/60 bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 px-4 py-10 md:py-12"
-      aria-label="Featured prints"
+      className="border-y border-brand-border bg-slate-800 px-4 py-10 dark:border-slate-600"
+      aria-label="Our prints"
     >
-      <div className="pointer-events-none absolute -left-20 top-0 h-64 w-64 rounded-full bg-cyan-500/20 blur-3xl motion-safe:animate-pulse-slow" />
-      <div className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl motion-safe:animate-pulse-slow" />
+      <div className="mx-auto max-w-lg text-center">
+        <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Our prints</p>
+        {isFavorite && (
+          <p className="mt-1 text-sm text-cyan-200">Jay&apos;s favorite: Samurai sword</p>
+        )}
 
-      <div className="relative mx-auto max-w-site">
-        <div className="mb-4 flex justify-center">
-          <span className="motion-safe:animate-bounce-subtle rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-[11px] font-extrabold uppercase tracking-widest text-slate-900">
-            Attention
-          </span>
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-lg">
+          <ProductImage product={product} className="aspect-[4/3] w-full min-h-[200px]" />
         </div>
 
-        <ProductCarousel3D
-          items={CAROUSEL_PRODUCTS}
-          activeIndex={index}
-          onIndexChange={setIndex}
-          onStep={go}
-          favoriteId={FAVORITE_PRODUCT_ID}
-        />
+        <p className="mt-4 text-sm text-slate-300">
+          Print {index + 1} of {count} — use the arrows to see them all
+        </p>
+
+        <div className="mt-4 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={prev}
+            className="rounded-full border border-white/30 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+          >
+            ← Previous
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="rounded-full border border-white/30 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
+          >
+            Next →
+          </button>
+        </div>
+
+        <div className="mt-4 flex justify-center gap-2">
+          {CAROUSEL_PRODUCTS.map((p, i) => (
+            <button
+              key={p.id}
+              type="button"
+              aria-label={p.title}
+              aria-current={i === index}
+              onClick={() => setIndex(i)}
+              className={`h-2.5 w-2.5 rounded-full ${
+                i === index ? "bg-cyan-400" : "bg-white/30 hover:bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+
+        <h2 className="mt-6 text-xl font-bold text-white">{product.title}</h2>
+        <p className="mt-1 text-lg font-semibold text-white">
+          {product.currency} {product.price}
+        </p>
+
+        <Link
+          to={`/product/${product.id}`}
+          className="btn-primary mt-5 inline-flex"
+        >
+          View this print
+        </Link>
+        <p className="mt-3">
+          <Link to="/shop" className="text-sm font-semibold text-cyan-300 hover:underline">
+            See all in the shop
+          </Link>
+        </p>
       </div>
     </section>
   );

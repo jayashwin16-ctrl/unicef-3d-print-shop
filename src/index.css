@@ -39,20 +39,6 @@
     }
   }
 
-  .carousel-3d-viewport {
-    transform-style: preserve-3d;
-  }
-
-  .carousel-3d-stage,
-  .carousel-3d-panel {
-    transform-style: preserve-3d;
-  }
-
-  .carousel-3d-panel {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
   html.dark .bg-brand-bg {
     @apply bg-slate-950;
   }
