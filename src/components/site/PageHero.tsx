@@ -14,7 +14,7 @@ export default function PageHero({ label, title, subtitle, image, children }: Pa
       <section className="relative isolate overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/Photos/home-bg.jpg')" }}
+          style={{ backgroundImage: "url('/Photos/home-bg.png')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-ink/75 via-brand-ink/60 to-brand-ink/85" />
         <div className="absolute inset-0 bg-mesh-hero opacity-90" />
