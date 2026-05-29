@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 type PageHeroProps = {
   label: string;
-  title: ReactNode;
+  title?: ReactNode;
   subtitle?: string;
   image?: boolean;
   children?: ReactNode;
@@ -22,11 +22,15 @@ export default function PageHero({ label, title, subtitle, image, children }: Pa
           <p className="animate-fade-up text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-300/90">
             {label}
           </p>
-          <h1 className="animate-fade-up mt-4 text-4xl font-extrabold tracking-tight text-white md:text-display-lg [&_span]:text-gradient">
-            {title}
-          </h1>
+          {title && (
+            <h1 className="animate-fade-up mt-4 text-4xl font-extrabold tracking-tight text-white md:text-display-lg [&_span]:text-gradient">
+              {title}
+            </h1>
+          )}
           {subtitle && (
-            <p className="animate-fade-up mx-auto mt-6 max-w-prose text-base leading-relaxed text-slate-200 md:text-lg">
+            <p
+              className={`animate-fade-up mx-auto max-w-prose text-base leading-relaxed text-slate-200 md:text-lg ${title ? "mt-6" : "mt-4"}`}
+            >
               {subtitle}
             </p>
           )}
@@ -42,9 +46,11 @@ export default function PageHero({ label, title, subtitle, image, children }: Pa
     <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg bg-mesh-hero">
       <div className="mx-auto max-w-site px-6 py-16 text-center md:py-20">
         <p className="section-label">{label}</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-heading md:text-display [&_span]:text-gradient">
-          {title}
-        </h1>
+        {title && (
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-heading md:text-display [&_span]:text-gradient">
+            {title}
+          </h1>
+        )}
         {subtitle && (
           <p className="mx-auto mt-5 max-w-prose text-base leading-relaxed text-brand-muted">{subtitle}</p>
         )}

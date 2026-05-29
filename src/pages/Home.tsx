@@ -15,7 +15,6 @@ export default function Home() {
       <PageHero
         image
         label="This project was created by Jay"
-        title={<>3D Prints for Good</>}
         subtitle="A student 3D print shop. 60% of proceeds goes to UNICEF USA."
       >
         <Link to="/shop" className="btn-primary">
