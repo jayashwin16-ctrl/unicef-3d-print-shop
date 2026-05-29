@@ -1,31 +1,17 @@
 import { Link } from "react-router-dom";
 import { products } from "../data/products";
 import ProductImage from "../components/ProductImage";
-import PageHero from "../components/site/PageHero";
+import HomeFirstFold from "../components/site/HomeFirstFold";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
-import FavoritePrintSpotlight from "../components/site/FavoritePrintSpotlight";
 
 export default function Home() {
   const featured = products.slice(0, 3);
 
   return (
     <>
-      <PageHero
-        image
-        label="This project was created by Jay"
-        subtitle="A student 3D print shop. 60% of proceeds goes to UNICEF USA."
-      >
-        <Link to="/shop" className="btn-primary">
-          Shop prints
-        </Link>
-        <Link to="/how-it-works" className="btn-outline">
-          How it works
-        </Link>
-      </PageHero>
-
-      <FavoritePrintSpotlight />
+      <HomeFirstFold />
 
       <StatsBar
         stats={[
