@@ -4,10 +4,6 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
-import LearnHub from "./pages/LearnHub";
-import FAQ from "./pages/FAQ";
-import Tools from "./pages/Tools";
-import Glossary from "./pages/Glossary";
 import Problem from "./pages/Problem";
 import Stats from "./pages/Stats";
 import WhyUnicef from "./pages/WhyUnicef";
@@ -24,10 +20,6 @@ export default function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/learn" element={<LearnHub />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/tools" element={<Tools />} />
-        <Route path="/glossary" element={<Glossary />} />
         <Route path="/problem" element={<Problem />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/why" element={<WhyUnicef />} />

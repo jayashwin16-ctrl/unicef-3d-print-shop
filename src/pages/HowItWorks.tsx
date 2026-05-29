@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import ExploreCards from "../components/site/ExploreCards";
-import PlainEnglish from "../components/site/PlainEnglish";
 
 const STEPS = [
   {
@@ -51,12 +50,6 @@ export default function HowItWorks() {
       />
 
       <Section>
-        <PlainEnglish className="mx-auto mb-8 max-w-xl">
-          <p>
-            You need a <strong>checkout code</strong> from the shop, then you fill in pickup info and
-            pay online. Money goes through Stripe; we never see your full card number.
-          </p>
-        </PlainEnglish>
         <ol className="mx-auto max-w-xl space-y-6">
           {STEPS.map((s) => (
             <li

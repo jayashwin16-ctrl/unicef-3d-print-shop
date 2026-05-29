@@ -2,10 +2,6 @@ import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import SiteDisclaimer from "./SiteDisclaimer";
-import HelpStrip from "./site/HelpStrip";
-import Breadcrumbs from "./site/Breadcrumbs";
-import LearnSidebar, { isLearnAreaPath, LearnMobileNav } from "./site/LearnSidebar";
-import { SiteHeaderTools } from "./advanced/SiteShell";
 import { LEARN_LINKS, PROJECT_LINKS, SHOP_LINKS } from "../config/siteNav";
 
 function NavLink({
@@ -13,13 +9,11 @@ function NavLink({
   label,
   active,
   onNavigate,
-  className = "",
 }: {
   to: string;
   label: string;
   active: boolean;
   onNavigate: () => void;
-  className?: string;
 }) {
   return (
     <Link
@@ -27,8 +21,8 @@ function NavLink({
       onClick={onNavigate}
       className={
         active
-          ? `font-semibold text-brand-heading ${className}`
-          : `text-brand-muted hover:text-brand-heading ${className}`
+          ? "font-semibold text-brand-heading"
+          : "text-brand-muted hover:text-brand-heading"
       }
     >
       {label}
@@ -67,23 +61,28 @@ export default function Layout({ children }: { children: ReactNode }) {
       : loc.pathname === path || loc.pathname.startsWith(`${path}/`);
 
   const shopActive = loc.pathname === "/shop" || loc.pathname.startsWith("/product");
-  const learnArea = isLearnAreaPath(loc.pathname);
-  const showCrumbs = loc.pathname !== "/";
 
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
-      <header className="glass-nav sticky top-0 z-50 px-4 py-3 md:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-          <Link to="/" className="shrink-0 text-[17px] font-bold text-brand-blue dark:text-cyan-400" onClick={close}>
+      <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-card px-4 py-3.5 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <Link to="/" className="shrink-0 text-[17px] font-bold text-brand-blue" onClick={close}>
             3D Prints for Good
           </Link>
+          <button
+            type="button"
+            className="text-2xl text-brand-heading md:hidden"
+            aria-label="Toggle menu"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            ☰
+          </button>
 
-          <div className="flex items-center gap-2 md:gap-4">
-            <nav
-              className={`${
-                menuOpen ? "flex" : "hidden"
-              } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card/95 px-6 py-5 text-sm backdrop-blur-xl md:static md:flex md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:bg-transparent md:p-0 dark:border-slate-700 dark:bg-slate-900/95 md:dark:bg-transparent`}
-            >
+          <nav
+            className={`${
+              menuOpen ? "flex" : "hidden"
+            } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card px-6 py-5 text-sm md:static md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:p-0`}
+          >
             <NavGroup title="Shop">
               {SHOP_LINKS.map(({ path, label }) => (
                 <li key={path}>
@@ -114,12 +113,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <NavGroup title="Learn" className="md:border-l md:border-brand-border md:pl-6">
               {LEARN_LINKS.map(({ path, label }) => (
                 <li key={path}>
-                  <NavLink
-                    to={path}
-                    label={label}
-                    active={isActive(path)}
-                    onNavigate={close}
-                  />
+                  <NavLink to={path} label={label} active={isActive(path)} onNavigate={close} />
                 </li>
               ))}
             </NavGroup>
@@ -127,17 +121,12 @@ export default function Layout({ children }: { children: ReactNode }) {
             <NavGroup title="Project" className="md:border-l md:border-brand-border md:pl-6">
               {PROJECT_LINKS.map(({ path, label }) => (
                 <li key={path}>
-                  <NavLink
-                    to={path}
-                    label={label}
-                    active={isActive(path)}
-                    onNavigate={close}
-                  />
+                  <NavLink to={path} label={label} active={isActive(path)} onNavigate={close} />
                 </li>
               ))}
             </NavGroup>
 
-            <div className="md:hidden border-t border-brand-border pt-3">
+            <div className="border-t border-brand-border pt-3 md:hidden">
               <Link
                 to="/"
                 onClick={close}
@@ -146,43 +135,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                 Home
               </Link>
             </div>
-            </nav>
-
-            <SiteHeaderTools />
-            <button
-              type="button"
-              className="text-2xl text-brand-heading md:hidden dark:text-slate-100"
-              aria-label="Toggle menu"
-              onClick={() => setMenuOpen((o) => !o)}
-            >
-              ☰
-            </button>
-          </div>
+          </nav>
         </div>
       </header>
 
-      <HelpStrip />
-
-      <main className="flex-1">
-        {showCrumbs && !learnArea && (
-          <div className="mx-auto max-w-6xl px-4 pt-4 md:px-8">
-            <Breadcrumbs />
-          </div>
-        )}
-
-        {learnArea ? (
-          <div className="mx-auto max-w-6xl px-4 pb-10 md:px-8">
-            {showCrumbs && <Breadcrumbs />}
-            <LearnMobileNav />
-            <div className="flex gap-8 lg:gap-10">
-              <LearnSidebar />
-              <div className="min-w-0 flex-1">{children}</div>
-            </div>
-          </div>
-        ) : (
-          children
-        )}
-      </main>
+      <main className="flex-1">{children}</main>
 
       <footer className="border-t border-brand-border bg-brand-card px-6 py-8">
         <div className="mx-auto grid max-w-4xl gap-8 text-sm md:grid-cols-3">
@@ -216,11 +173,6 @@ export default function Layout({ children }: { children: ReactNode }) {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link to="/faq" className="hover:text-brand-heading hover:underline">
-                  Q&A
-                </Link>
-              </li>
             </ul>
           </div>
           <div>

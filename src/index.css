@@ -11,76 +11,6 @@
     @apply bg-brand-surface font-sans text-slate-700 antialiased;
   }
 
-  html.dark body {
-    @apply bg-slate-950 text-slate-300;
-  }
-
-  html.text-large {
-    font-size: 112.5%;
-  }
-
-  html.compact-ui header {
-    @apply py-2;
-  }
-
-  html.reduce-motion *,
-  html.reduce-motion *::before,
-  html.reduce-motion *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .motion-safe\:animate-pulse-slow,
-    .motion-safe\:animate-bounce-subtle,
-    .motion-safe\:animate-glow-ring {
-      animation: none !important;
-    }
-  }
-
-  .carousel-3d-viewport {
-    transform-style: preserve-3d;
-  }
-
-  .carousel-3d-stage,
-  .carousel-3d-panel {
-    transform-style: preserve-3d;
-  }
-
-  .carousel-3d-panel {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
-  html.dark .bg-brand-bg {
-    @apply bg-slate-950;
-  }
-
-  html.dark .bg-brand-card {
-    @apply bg-slate-800 text-slate-200;
-  }
-
-  html.dark .bg-brand-surface {
-    @apply bg-slate-950;
-  }
-
-  html.dark .text-brand-heading {
-    @apply text-slate-100;
-  }
-
-  html.dark .text-brand-muted {
-    @apply text-slate-400;
-  }
-
-  html.dark .border-brand-border {
-    @apply border-slate-600;
-  }
-
-  html.dark .section-title {
-    @apply text-slate-100;
-  }
-
   ::selection {
     @apply bg-cyan-200/80 text-brand-ink;
   }
@@ -111,19 +41,7 @@
     @apply overflow-hidden rounded-2xl border border-brand-border/80 bg-brand-card shadow-card transition duration-300 hover:-translate-y-1 hover:border-cyan-200/80 hover:shadow-card-hover;
   }
 
-  .glass-nav {
-    @apply border-b border-white/60 bg-white/80 shadow-nav backdrop-blur-xl;
-  }
-
   .text-gradient {
     @apply bg-gradient-to-r from-cyan-500 to-teal-600 bg-clip-text text-transparent;
-  }
-
-  .pill-active {
-    @apply bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-soft;
-  }
-
-  .pill-inactive {
-    @apply border border-brand-border bg-brand-card text-brand-muted transition hover:border-cyan-200 hover:text-brand-heading;
   }
 }

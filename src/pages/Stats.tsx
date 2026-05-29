@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import PageHero from "../components/site/PageHero";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
-import PlainEnglish from "../components/site/PlainEnglish";
-import BarChart from "../components/advanced/BarChart";
 import { UNICEF_REGIONS_OVERVIEW } from "../config/siteNav";
 
 const REGION_FACTS = [
@@ -84,32 +82,7 @@ export default function Stats() {
         subtitle="UNICEF organizes much of its work through seven regional offices worldwide. Here is what children face in those focus areas."
       />
 
-      <Section>
-        <PlainEnglish className="mx-auto max-w-2xl">
-          <p>
-            These numbers come from UNICEF regional offices. The chart below compares how many
-            countries each region covers—bigger bars mean more countries in that regional group.
-          </p>
-        </PlainEnglish>
-      </Section>
-
-      <Section title="Regions at a glance" alt>
-        <div className="mx-auto max-w-2xl">
-          <BarChart
-            items={[
-              { label: "East Asia & Pacific", value: 30, display: "30+" },
-              { label: "Latin America & Caribbean", value: 30, display: "30+" },
-              { label: "West & Central Africa", value: 24, display: "24" },
-              { label: "Eastern & Southern Africa", value: 20, display: "20+" },
-              { label: "Europe & Central Asia", value: 20, display: "20+" },
-              { label: "Middle East & North Africa", value: 20, display: "20+" },
-              { label: "South Asia", value: 8, display: "8" },
-            ]}
-          />
-        </div>
-      </Section>
-
-      <Section title="Seven global regions">
+      <Section title="Seven global regions" alt>
         <p className="mx-auto mb-6 max-w-lg text-center text-sm text-brand-muted">
           UNICEF USA supports programs in more than 190 countries. Much of that work is organized
           through seven regional offices.
