@@ -5,7 +5,6 @@ import PageHero from "../components/site/PageHero";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
-import TotalRaisedSign from "../components/site/TotalRaisedSign";
 import FavoritePrintSpotlight from "../components/site/FavoritePrintSpotlight";
 
 export default function Home() {
@@ -34,10 +33,6 @@ export default function Home() {
       </PageHero>
 
       <FavoritePrintSpotlight />
-
-      <section className="border-b border-brand-border/80 bg-brand-bg px-4 py-10">
-        <TotalRaisedSign size="large" />
-      </section>
 
       <StatsBar
         stats={[
