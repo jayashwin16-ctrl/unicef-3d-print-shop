@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import FathersDayBanner from "../FathersDayBanner";
 import FavoritePrintSpotlight from "./FavoritePrintSpotlight";
 
 export default function HomeFirstFold() {
@@ -17,6 +18,7 @@ export default function HomeFirstFold() {
             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-300/90">
               This project was created by Jay
             </p>
+            <FathersDayBanner className="mx-auto mt-4 max-w-md lg:mx-0" />
             <p className="mx-auto mt-4 max-w-prose text-base leading-relaxed text-slate-200 md:text-lg lg:mx-0">
               A student 3D print shop. 60% of proceeds goes to UNICEF USA.
             </p>

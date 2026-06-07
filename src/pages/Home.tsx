@@ -5,9 +5,12 @@ import HomeFirstFold from "../components/site/HomeFirstFold";
 import StatsBar from "../components/site/StatsBar";
 import Section from "../components/site/Section";
 import CtaBanner from "../components/site/CtaBanner";
+import ProductPrice from "../components/ProductPrice";
+import { formatMoney, getDiscountedPrice } from "../lib/pricing";
 
 export default function Home() {
   const featured = products.slice(0, 3);
+  const startingPrice = formatMoney(Math.min(...products.map((p) => getDiscountedPrice(p.price))));
 
   return (
     <>
@@ -18,7 +21,7 @@ export default function Home() {
           { value: "390M+", label: "Children in extreme poverty (global)", tone: "green" },
           { value: "60%", label: "Of proceeds donated", tone: "green" },
           { value: "5", label: "Prints in our shop", tone: "dark" },
-          { value: "$9.99+", label: "Starting price", tone: "dark" },
+          { value: `$${startingPrice}+`, label: "Starting price (sale)", tone: "dark" },
         ]}
       />
 
@@ -57,9 +60,9 @@ export default function Home() {
               <div className="p-4">
                 <h3 className="font-semibold text-brand-heading group-hover:text-brand-accent">{p.title}</h3>
                 <p className="mt-1 text-sm text-cyan-800">{p.donationPercent}% donated</p>
-                <p className="mt-2 font-bold text-brand-heading">
-                  {p.currency} {p.price}
-                </p>
+                <div className="mt-2">
+                  <ProductPrice product={p} size="sm" />
+                </div>
               </div>
             </Link>
           ))}

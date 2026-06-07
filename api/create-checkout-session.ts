@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHmac, timingSafeEqual } from "crypto";
 import Stripe from "stripe";
+import { FATHERS_DAY_SALE, getDiscountedPrice } from "./lib/pricing.js";
 
 const CH_OK = "ch_ok";
 
@@ -177,16 +178,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(404).json({ error: `Product not found: ${id}` });
       return;
     }
+    const unitPrice = getDiscountedPrice(product.price);
+    const saleNote =
+      FATHERS_DAY_SALE.active ? ` (${FATHERS_DAY_SALE.percentOff}% Father's Day discount applied)` : "";
     line_items.push({
       quantity: qty,
       price_data: {
         currency: (product.currency || "usd").toLowerCase(),
         product_data: {
-          name: product.title,
-          description: product.description?.slice(0, 500),
+          name: FATHERS_DAY_SALE.active ? `${product.title} — Father's Day sale` : product.title,
+          description: `${product.description?.slice(0, 480) ?? ""}${saleNote}`.slice(0, 500),
           images: product.image ? [new URL(product.image, origin).href] : undefined,
         },
-        unit_amount: Math.round(product.price * 100),
+        unit_amount: Math.round(unitPrice * 100),
       },
     });
   }

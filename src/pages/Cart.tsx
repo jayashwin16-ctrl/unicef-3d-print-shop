@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { getProduct } from "../data/products";
+import FathersDayBanner from "../components/FathersDayBanner";
+import ProductPrice, { getProductChargePrice } from "../components/ProductPrice";
+import { formatMoney } from "../lib/pricing";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -26,7 +29,8 @@ export default function Cart() {
   const rows = items.map(({ productId, quantity }) => {
     const product = getProduct(productId);
     if (!product) return null;
-    const subtotal = product.price * quantity;
+    const unitPrice = getProductChargePrice(product);
+    const subtotal = unitPrice * quantity;
     return (
       <div
         key={productId}
@@ -49,7 +53,7 @@ export default function Cart() {
             {product.title}
           </Link>
           <p className="text-slate-600 text-sm mt-0.5">
-            {product.currency} {product.price} each
+            <ProductPrice product={product} size="sm" /> each
           </p>
           <div className="flex items-center gap-2 mt-2">
             <select
@@ -72,7 +76,7 @@ export default function Cart() {
         </div>
         <div className="text-right shrink-0">
           <span className="font-semibold text-slate-900">
-            {product.currency} {subtotal}
+            {product.currency} {formatMoney(subtotal)}
           </span>
         </div>
       </div>
@@ -81,13 +85,14 @@ export default function Cart() {
 
   const total = items.reduce((sum, { productId, quantity }) => {
     const p = getProduct(productId);
-    return sum + (p ? p.price * quantity : 0);
+    return sum + (p ? getProductChargePrice(p) * quantity : 0);
   }, 0);
   const currency = getProduct(items[0]?.productId)?.currency ?? "USD";
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">Cart</h1>
+      <h1 className="text-2xl font-bold text-slate-900 mb-4">Cart</h1>
+      <FathersDayBanner className="mb-6" />
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-4 divide-y divide-slate-100">
           {rows}
@@ -103,7 +108,7 @@ export default function Cart() {
           </p>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="text-lg font-bold text-slate-900">
-              Total: {currency} {total}
+              Total: {currency} {formatMoney(total)}
             </p>
             {error && (
               <p className="w-full text-sm text-red-600" role="alert">

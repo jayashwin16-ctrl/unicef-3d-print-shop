@@ -3,6 +3,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../data/products";
 import ProductImageSlider from "../components/ProductImageSlider";
 import SchoolPickupBanner from "../components/SchoolPickupBanner";
+import PrintFileDownload from "../components/PrintFileDownload";
+import SamuraiSwordWarning from "../components/SamuraiSwordWarning";
+import FathersDayBanner from "../components/FathersDayBanner";
+import ProductPrice from "../components/ProductPrice";
 import { useCart } from "../context/CartContext";
 
 type Review = {
@@ -98,24 +102,31 @@ export default function ProductDetail() {
         ← Back to shop
       </Link>
       <div className="grid md:grid-cols-2 gap-12 items-start">
-        <ProductImageSlider product={product} className="aspect-square" />
+        <div>
+          <ProductImageSlider product={product} className="aspect-square" />
+          <SamuraiSwordWarning productId={product.id} className="mt-4" />
+        </div>
         <div>
           <span className="text-sm font-medium text-brand-blue-dark">{product.category}</span>
           <h1 className="text-3xl font-bold text-slate-900 mt-2">{product.title}</h1>
+          <SamuraiSwordWarning productId={product.id} className="mt-3 md:hidden" />
           {averageRating !== null && (
             <p className="mt-2 text-sm text-slate-600">
               Rating: <span className="font-semibold text-slate-900">{averageRating}</span> / 5{" "}
               <span className="text-slate-500">({reviews.length} review{reviews.length === 1 ? "" : "s"})</span>
             </p>
           )}
+          <FathersDayBanner className="mt-4" />
           <p className="text-slate-600 mt-4">{product.description}</p>
-          <p className="mt-6 text-2xl font-bold text-slate-900">
-            {product.currency} {product.price}
-          </p>
+          <div className="mt-6">
+            <ProductPrice product={product} size="lg" />
+          </div>
           <p className="mt-2 text-sm text-brand-blue-dark">
             {product.donationPercent}% of proceeds from this item is donated to UNICEF USA (independent
             student project; not affiliated with or endorsed by UNICEF or UNICEF USA).
           </p>
+          <PrintFileDownload product={product} />
+
           <div className="mt-6">
             <SchoolPickupBanner />
           </div>
@@ -143,6 +154,15 @@ export default function ProductDetail() {
             >
               Buy now
             </button>
+            {product.modelFile && (
+              <a
+                href={product.modelFile}
+                download={product.modelFile.split("/").pop()}
+                className="w-full md:w-auto inline-flex items-center justify-center border-2 border-slate-300 text-slate-800 px-8 py-3 rounded-full font-semibold hover:bg-slate-50 transition"
+              >
+                Download STL
+              </a>
+            )}
           </div>
         </div>
       </div>

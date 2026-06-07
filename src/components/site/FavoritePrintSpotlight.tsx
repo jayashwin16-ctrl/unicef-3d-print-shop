@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FAVORITE_PRODUCT_ID, products } from "../../data/products";
 import ProductImage from "../ProductImage";
+import PrintFileDownload from "../PrintFileDownload";
+import SamuraiSwordWarning from "../SamuraiSwordWarning";
+import ProductPrice from "../ProductPrice";
 
 const CAROUSEL_PRODUCTS = [
   products.find((p) => p.id === FAVORITE_PRODUCT_ID)!,
@@ -42,6 +45,13 @@ export default function FavoritePrintSpotlight({ embedded = false }: FavoritePri
           product={product}
           className={`aspect-[4/3] w-full ${embedded ? "min-h-[140px] sm:min-h-[180px]" : "min-h-[200px]"}`}
         />
+        {isFavorite && (
+          <SamuraiSwordWarning
+            productId={product.id}
+            onDark
+            className="absolute bottom-2 left-2 right-2 text-center text-xs sm:text-sm"
+          />
+        )}
       </div>
 
       <p className={`mt-3 text-sm ${embedded ? "text-slate-300" : "text-slate-300"}`}>
@@ -66,16 +76,19 @@ export default function FavoritePrintSpotlight({ embedded = false }: FavoritePri
       </div>
 
       <h2 className={`mt-4 font-bold text-white ${embedded ? "text-lg" : "text-xl"}`}>{product.title}</h2>
-      <p className="mt-1 font-semibold text-white">
-        {product.currency} {product.price}
-      </p>
+      <div className="mt-1 [&_.line-through]:text-slate-400 [&_span]:text-white">
+        <ProductPrice product={product} size="sm" />
+      </div>
 
-      <Link
-        to={`/product/${product.id}`}
-        className={`btn-primary mt-4 inline-flex ${embedded ? "!py-2.5 !px-6" : ""}`}
-      >
-        View this print
-      </Link>
+      <div className={`mt-4 flex flex-wrap items-center justify-center gap-3 ${embedded ? "lg:justify-start" : ""}`}>
+        <Link
+          to={`/product/${product.id}`}
+          className={`btn-primary inline-flex ${embedded ? "!py-2.5 !px-6" : ""}`}
+        >
+          View this print
+        </Link>
+        {product.modelFile && <PrintFileDownload product={product} variant="compact" />}
+      </div>
       <p className="mt-2">
         <Link
           to="/shop"
