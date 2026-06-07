@@ -9,8 +9,6 @@ export interface Product {
   image?: string;
   images?: string[];
   imageGradient?: string;
-  /** Path to STL in public/downloads (e.g. /downloads/samurai-sword.stl) */
-  modelFile?: string;
 }
 
 export const products: Product[] = [
@@ -25,7 +23,6 @@ export const products: Product[] = [
     image: "/Photos/egg-fidget-2.jpg",
     images: ["/Photos/egg-fidget.jpg", "/Photos/egg-fidget-2.jpg"],
     imageGradient: "from-amber-200 to-orange-400",
-    modelFile: "/downloads/egg-fidget.stl",
   },
   {
     id: "2",
@@ -38,7 +35,6 @@ export const products: Product[] = [
     image: "/Photos/samurai-sword-2.jpg",
     images: ["/Photos/samurai-sword.jpg", "/Photos/samurai-sword-2.jpg"],
     imageGradient: "from-slate-600 to-slate-800",
-    modelFile: "/downloads/samurai-sword.stl",
   },
   {
     id: "3",
@@ -51,7 +47,6 @@ export const products: Product[] = [
     image: "/Photos/articulated-dragon.jpg",
     images: ["/Photos/articulated-dragon.jpg"],
     imageGradient: "from-red-600 to-amber-500",
-    modelFile: "/downloads/articulated-dragon.stl",
   },
   {
     id: "4",
@@ -64,7 +59,6 @@ export const products: Product[] = [
     image: "/Photos/shiny-dragon.jpg",
     images: ["/Photos/shiny-dragon.jpg"],
     imageGradient: "from-yellow-400 to-amber-600",
-    modelFile: "/downloads/shiny-dragon.stl",
   },
   {
     id: "5",
@@ -77,7 +71,6 @@ export const products: Product[] = [
     image: "/Photos/skull-pass-through-2.jpg",
     images: ["/Photos/skull-pass-through.jpg", "/Photos/skull-pass-through-2.jpg"],
     imageGradient: "from-gray-700 to-gray-900",
-    modelFile: "/downloads/skull-pass-through.stl",
   },
 ];
 

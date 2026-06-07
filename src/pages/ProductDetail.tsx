@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProduct } from "../data/products";
 import ProductImageSlider from "../components/ProductImageSlider";
 import SchoolPickupBanner from "../components/SchoolPickupBanner";
-import PrintFileDownload from "../components/PrintFileDownload";
 import SamuraiSwordWarning from "../components/SamuraiSwordWarning";
 import FathersDayBanner from "../components/FathersDayBanner";
 import ProductPrice from "../components/ProductPrice";
@@ -125,8 +124,6 @@ export default function ProductDetail() {
             {product.donationPercent}% of proceeds from this item is donated to UNICEF USA (independent
             student project; not affiliated with or endorsed by UNICEF or UNICEF USA).
           </p>
-          <PrintFileDownload product={product} />
-
           <div className="mt-6">
             <SchoolPickupBanner />
           </div>
@@ -154,15 +151,6 @@ export default function ProductDetail() {
             >
               Buy now
             </button>
-            {product.modelFile && (
-              <a
-                href={product.modelFile}
-                download={product.modelFile.split("/").pop()}
-                className="w-full md:w-auto inline-flex items-center justify-center border-2 border-slate-300 text-slate-800 px-8 py-3 rounded-full font-semibold hover:bg-slate-50 transition"
-              >
-                Download STL
-              </a>
-            )}
           </div>
         </div>
       </div>

@@ -85,16 +85,6 @@ export default function Shop() {
                       {p.donationPercent}% donated
                     </span>
                   </div>
-                  {p.modelFile && (
-                    <a
-                      href={p.modelFile}
-                      download={p.modelFile.split("/").pop()}
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-3 inline-block text-sm font-semibold text-brand-blue hover:underline"
-                    >
-                      Download STL file
-                    </a>
-                  )}
                 </div>
               </Link>
             ))}

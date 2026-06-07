@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FAVORITE_PRODUCT_ID, products } from "../../data/products";
 import ProductImage from "../ProductImage";
-import PrintFileDownload from "../PrintFileDownload";
 import SamuraiSwordWarning from "../SamuraiSwordWarning";
 import ProductPrice from "../ProductPrice";
 
@@ -87,7 +86,6 @@ export default function FavoritePrintSpotlight({ embedded = false }: FavoritePri
         >
           View this print
         </Link>
-        {product.modelFile && <PrintFileDownload product={product} variant="compact" />}
       </div>
       <p className="mt-2">
         <Link
