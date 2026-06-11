@@ -7,7 +7,7 @@ export default function HomeFirstFold() {
     <section className="relative isolate overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/Photos/home-bg.png')" }}
+        style={{ backgroundImage: "url('/Photos/home-bg.webp')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-brand-ink/80 via-brand-ink/70 to-brand-ink/90" />
       <div className="absolute inset-0 bg-mesh-hero opacity-90" />

@@ -28,7 +28,7 @@ export default function Home() {
       <Section label="Our Mission" title="What We Do">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 md:flex-row">
           <div className="flex min-h-[200px] flex-1 overflow-hidden rounded-2xl border border-brand-border/80 shadow-card">
-            <img src="/Photos/home-bg.png" alt="Children and community" className="h-full w-full object-cover" />
+            <img src="/Photos/home-bg.webp" alt="Children and community" className="h-full w-full object-cover" />
           </div>
           <div className="flex-1 text-sm leading-relaxed text-slate-700">
             <p className="mb-3.5">

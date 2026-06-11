@@ -14,6 +14,7 @@ import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutCancel from "./pages/CheckoutCancel";
 import CheckoutPaymentError from "./pages/CheckoutPaymentError";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/checkout/success" element={<CheckoutSuccess />} />
         <Route path="/checkout/cancel" element={<CheckoutCancel />} />
         <Route path="/checkout/payment-error" element={<CheckoutPaymentError />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   );
