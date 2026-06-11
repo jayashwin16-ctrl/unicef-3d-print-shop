@@ -81,7 +81,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <nav
             className={`${
               menuOpen ? "flex" : "hidden"
-            } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card px-6 py-5 text-sm md:static md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:p-0`}
+            } absolute left-0 right-0 top-full max-h-[85vh] flex-col gap-5 overflow-y-auto border-b border-brand-border bg-brand-card px-6 py-5 text-sm md:static md:flex md:max-h-none md:flex-row md:items-center md:gap-6 md:border-0 md:overflow-visible md:p-0`}
           >
             <NavGroup title="Shop">
               {SHOP_LINKS.map(({ path, label }) => (
@@ -142,7 +142,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-brand-border bg-brand-card px-6 py-8">
-        <div className="mx-auto grid max-w-4xl gap-8 text-sm md:grid-cols-3">
+        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-8 text-sm sm:grid-cols-3">
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-heading">Shop</p>
             <ul className="space-y-2 text-brand-muted">

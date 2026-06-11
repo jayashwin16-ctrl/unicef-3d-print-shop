@@ -32,11 +32,11 @@ export default function ProductImageSlider({
 
   return (
     <div className={`relative ${className}`}>
-      <div className="relative overflow-hidden rounded-2xl">
+      <div className="relative h-full overflow-hidden rounded-2xl">
         {images.map((img, index) => (
           <div
             key={index}
-            className={`transition-opacity duration-300 ${
+            className={`h-full transition-opacity duration-300 ${
               index === currentIndex ? "opacity-100" : "opacity-0 absolute inset-0"
             }`}
           >

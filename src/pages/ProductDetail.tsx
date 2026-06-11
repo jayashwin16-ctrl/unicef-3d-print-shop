@@ -102,8 +102,8 @@ export default function ProductDetail() {
       </Link>
       <div className="grid md:grid-cols-2 gap-12 items-start">
         <div>
-          <ProductImageSlider product={product} className="aspect-square" />
-          <SamuraiSwordWarning productId={product.id} className="mt-4" />
+          <ProductImageSlider product={product} className="aspect-[4/3]" />
+          <SamuraiSwordWarning productId={product.id} className="mt-4 hidden md:block" />
         </div>
         <div>
           <span className="text-sm font-medium text-brand-blue-dark">{product.category}</span>
@@ -155,7 +155,7 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <div className="mt-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900">Leave a 5‑star review</h2>
             <p className="mt-1 text-sm text-slate-600">Tap the stars, then submit your review.</p>
 
@@ -203,7 +203,7 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={saveReview}
-                className="w-full sm:w-auto rounded-full bg-amber-500 px-6 py-2.5 font-semibold text-white transition hover:bg-amber-600"
+                className="w-full rounded-full bg-amber-500 px-6 py-2.5 font-semibold text-white transition hover:bg-amber-600 sm:w-auto sm:justify-self-start"
               >
                 Submit review
               </button>
