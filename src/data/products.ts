@@ -72,6 +72,18 @@ export const products: Product[] = [
     images: ["/Photos/skull-pass-through.webp", "/Photos/skull-pass-through-2.webp"],
     imageGradient: "from-gray-700 to-gray-900",
   },
+  {
+    id: "6",
+    title: "World Cup trophy",
+    description: "Detailed 3D-printed World Cup trophy replica—a must-have for any football fan. Printed in durable PLA; a portion of every sale supports our donation pledge.",
+    price: 17.99,
+    currency: "USD",
+    donationPercent: 60,
+    category: "Collectibles",
+    image: "/Photos/worldcup.webp",
+    images: ["/Photos/worldcup.webp"],
+    imageGradient: "from-yellow-400 to-amber-600",
+  },
 ];
 
 export function getProduct(id: string): Product | undefined {

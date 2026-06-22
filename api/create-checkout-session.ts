@@ -114,6 +114,7 @@ function getProduct(id: string): { title: string; description?: string; price: n
     "3": { title: "Articulated dragon", description: "Flexible articulated dragon figure.", price: 17.99, currency: "usd", image: "/Photos/articulated-dragon.jpg" },
     "4": { title: "Shiny dragon", description: "Beautiful shiny dragon figure.", price: 14.99, currency: "usd", image: "/Photos/shiny-dragon.jpg" },
     "5": { title: "Skull pass-through toy", description: "Unique 3D-printed skull with pass-through design.", price: 14.99, currency: "usd", image: "/Photos/skull-pass-through-2.jpg" },
+    "6": { title: "World Cup trophy", description: "Detailed 3D-printed World Cup trophy replica.", price: 17.99, currency: "usd", image: "/Photos/worldcup.webp" },
   };
   return products[id] ?? null;
 }
